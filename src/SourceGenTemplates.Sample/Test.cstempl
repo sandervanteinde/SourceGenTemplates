@@ -1,0 +1,16 @@
+﻿::filename HelloWorld
+using System;
+
+public class Test1
+{
+  public static void SayHello()
+  {
+    Console.WriteLine("Hello!");
+  }
+}
+
+::filename Test2
+public class Test2
+{
+  public static void SayHello() { }
+}

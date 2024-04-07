@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using SourceGenTemplates.Generation;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Tokenization;
 
@@ -37,31 +38,28 @@ public class SampleSourceGenerator : ISourceGenerator
                 continue;
             }
 
-            var tokenizer = new Tokenizer(sourceText);
-            var parser = new Parser(tokenizer, Path.GetFileNameWithoutExtension(additionalFile.Path));
-
-            if (parser.TryParse(out var result, out var diagnosticError))
+            try
             {
-                foreach (var file in result!.GetFileNames())
-                {
-                    context.AddSource($"{file}.g.cs", result.GetFileContents(file));
-                }
+                var tokenizer = new Tokenizer(sourceText);
+                var initialFileName = Path.GetFileNameWithoutExtension(additionalFile.Path);
+                var parser = new Parser(tokenizer);
+                var file = parser.ParseFileNode();
+                var generator = new Generator(initialFileName, file, context);
+                generator.AddToOutput();
             }
-            else
+            catch (ParserException exception)
             {
                 const DiagnosticSeverity severity = DiagnosticSeverity.Error;
                 var diagnosticDescriptor = new DiagnosticDescriptor(
                     "sourcegentemplates001", "Invalid expression", "Parse error: {0}", "Design", severity, isEnabledByDefault: true
                 );
-                _ = tokenizer.TryPeek(out var currentToken);
                 var diagnostic = Diagnostic.Create(
                     diagnosticDescriptor,
-                    Location.Create(additionalFile.Path, new TextSpan(start: 0, sourceText.Length), tokenizer.GetCurrentLocation()),
-                    diagnosticError
+                    Location.Create(additionalFile.Path, new TextSpan(start: 0, sourceText.Length), exception.LinePosition),
+                    exception.Message
                 );
-                context.ReportDiagnostic(diagnostic);
+                // context.ReportDiagnostic(diagnostic);
             }
-            // do something with diagnostic error
         }
     }
 }

@@ -1,15 +1,15 @@
-﻿::filename HelloWorld
-using System;
+﻿using System;
 
 public class Test1
 {
   public static void SayHello()
   {
-    Console.WriteLine("Hello!");
+    ::for 0..10 as test;
+    Console.WriteLine("Hello test! ::test::");
+    ::endfor;
   }
 }
 
-::filename Test2
 public class Test2
 {
   public static void SayHello() { }

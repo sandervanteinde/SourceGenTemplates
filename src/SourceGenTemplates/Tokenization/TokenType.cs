@@ -4,5 +4,12 @@ public enum TokenType
 {
     SourceText,
     FileNameDirective,
-    Identifier
+    Identifier,
+    For,
+    EndFor,
+    Number,
+    DoubleDot,
+    As,
+    CodeContextSwitch,
+    CodeContextEnd
 }

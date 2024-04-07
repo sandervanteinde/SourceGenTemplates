@@ -4,13 +4,11 @@ public class Test1
 {
   public static void SayHello()
   {
-    ::for 0..10 as test;
-    Console.WriteLine("Hello test! ::test::");
-    ::endfor;
+    ::for 0..10 as i;
+    Console.WriteLine("Hello test! ::i::");
+    ::end;
+    ::foreach class in assembly as c;
+    Console.WriteLine("Class in file: ::c::");
+    ::end;
   }
-}
-
-public class Test2
-{
-  public static void SayHello() { }
 }

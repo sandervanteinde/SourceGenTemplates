@@ -1,22 +1,10 @@
-﻿namespace SourceGenTemplates.Tokenization;
+﻿using Microsoft.CodeAnalysis.Text;
 
-public class SourceTextToken : Token
+namespace SourceGenTemplates.Tokenization;
+
+public class SourceTextToken(LinePositionSpan position, string sourceText) : Token(position)
 {
-    private SourceTextToken()
-    {
-    }
-
     public override TokenType TokenType => TokenType.SourceText;
 
-    public string SourceText { get; private set; } = null!;
-
-    public override int GetLength()
-    {
-        return SourceText.Length;
-    }
-
-    public static SourceTextToken Create(string sourceText)
-    {
-        return new SourceTextToken { SourceText = sourceText };
-    }
+    public string SourceText => sourceText;
 }

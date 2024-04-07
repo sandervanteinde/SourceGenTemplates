@@ -1,11 +1,8 @@
-﻿namespace SourceGenTemplates.Tokenization;
+﻿using Microsoft.CodeAnalysis.Text;
 
-public class FileNameToken : Token
+namespace SourceGenTemplates.Tokenization;
+
+public class FileNameToken(LinePositionSpan position) : Token(position)
 {
     public override TokenType TokenType => TokenType.FileNameDirective;
-
-    public override int GetLength()
-    {
-        return 8;
-    }
 }

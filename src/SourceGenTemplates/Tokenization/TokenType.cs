@@ -6,10 +6,14 @@ public enum TokenType
     FileNameDirective,
     Identifier,
     For,
-    EndFor,
+    End,
     Number,
     DoubleDot,
     As,
     CodeContextSwitch,
-    CodeContextEnd
+    CodeContextEnd,
+    Class,
+    Assembly,
+    Foreach,
+    In
 }

@@ -1,12 +1,9 @@
-﻿namespace SourceGenTemplates.Tokenization;
+﻿using Microsoft.CodeAnalysis.Text;
 
-public class IdentifierToken(string identifier) : Token
+namespace SourceGenTemplates.Tokenization;
+
+public class IdentifierToken(LinePositionSpan position, string identifier) : Token(position)
 {
     public string Identifier => identifier;
     public override TokenType TokenType => TokenType.Identifier;
-
-    public override int GetLength()
-    {
-        return Identifier.Length;
-    }
 }

@@ -1,11 +1,8 @@
+using Microsoft.CodeAnalysis.Text;
+
 namespace SourceGenTemplates.Tokenization;
 
-public class ForToken : Token
+public class ForToken(LinePositionSpan position) : Token(position)
 {
     public override TokenType TokenType => TokenType.For;
-
-    public override int GetLength()
-    {
-        return 3;
-    }
 }

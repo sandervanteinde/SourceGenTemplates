@@ -1,13 +1,9 @@
+using Microsoft.CodeAnalysis.Text;
+
 namespace SourceGenTemplates.Tokenization;
 
-public class NumberToken(int number) : Token
+public class NumberToken(LinePositionSpan position, int number) : Token(position)
 {
     public override TokenType TokenType => TokenType.Number;
     public int Number => number;
-
-    public override int GetLength()
-    {
-        return number.ToString()
-            .Length;
-    }
 }

@@ -20,7 +20,7 @@ public class SampleSourceGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
-        // No initialization required for this generator.
+        context.RegisterForSyntaxNotifications(() => new SyntaxReceiver());
     }
 
     public void Execute(GeneratorExecutionContext context)
@@ -46,7 +46,7 @@ public class SampleSourceGenerator : ISourceGenerator
                 var initialFileName = Path.GetFileNameWithoutExtension(additionalFile.Path);
                 var parser = new Parser(tokenizer);
                 var file = parser.ParseFileNode();
-                var generator = new Generator(initialFileName, file, context);
+                var generator = new Generator(initialFileName, file, context, ((SyntaxReceiver)context.SyntaxContextReceiver!).CompilationContext);
                 generator.AddToOutput();
             }
             catch (ParserException exception)
@@ -60,7 +60,7 @@ public class SampleSourceGenerator : ISourceGenerator
                     Location.Create(additionalFile.Path, new TextSpan(start: 0, sourceText.Length), exception.LinePosition),
                     exception.Message
                 );
-                context.ReportDiagnostic(diagnostic);
+                // context.ReportDiagnostic(diagnostic);
             }
         }
     }

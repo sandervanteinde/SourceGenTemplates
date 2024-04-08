@@ -9,10 +9,10 @@ using SourceGenTemplates.Parsing.Foreach;
 
 namespace SourceGenTemplates.Generation;
 
-public class Generator(string fileName, FileNode file, GeneratorExecutionContext context)
+public class Generator(string fileName, FileNode file, GeneratorExecutionContext context, CompilationContext compilationContext)
 {
     private readonly StringBuilder _sb = new();
-    private readonly Dictionary<string, string> _variables = new();
+    private readonly VariableContext _variables = new();
 
     public void AddToOutput()
     {
@@ -46,7 +46,9 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool GenerateDirectiveBlockNode(VariableInsertionBlockNode node)
     {
-        if (!_variables.TryGetValue(node.Identifier.Identifier, out var value))
+        var value = _variables.GetOrThrow<object>(node.Identifier);
+
+        if (value is null)
         {
             throw new ParserException($"Variable with name {node.Identifier.Identifier} was not defined", node.Identifier);
         }
@@ -74,7 +76,12 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool GenerateForeachDirectiveNode(ForeachNode node)
     {
-        _sb.Append("/* TODO: Add Foreach Loop implementation here */");
+        var identifier = node.Identifier;
+        foreach (var @class in compilationContext.Classes)
+        {
+            using var variableContext = _variables.AddVariableToContext(identifier?.Identifier, @class);
+            GenerateBlocks(node.Blocks);
+        }
         return true;
     }
 
@@ -82,21 +89,11 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
     {
         var start = node.Range.StartRange.Number;
         var end = node.Range.EndRange.Number;
-        var variableName = node.Identifier?.Identifier.Identifier;
 
         for (var i = start; i < end; i++)
         {
-            if (variableName is not null)
-            {
-                _variables[variableName] = i.ToString();
-            }
-
+            using var variableContext = _variables.AddVariableToContext(node.Identifier?.Identifier, i);
             GenerateBlocks(node.Blocks);
-
-            if (variableName is not null)
-            {
-                _variables.Remove(variableName);
-            }
         }
 
         return true;

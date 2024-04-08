@@ -1,5 +1,1 @@
-﻿// Test1.SayHello();
-
-using System;
-
-Console.WriteLine("Hello, world!");
+﻿Test1.SayHello();

@@ -7,7 +7,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B89E49E9-6C40-4DD8-9F86-839401D5BBF6}"
 	ProjectSection(SolutionItems) = preProject
 		docs\README.md = docs\README.md
-		docs\language.md = docs\language.md
+		docs\grammer.md = docs\grammer.md
 	EndProjectSection
 EndProject
 Global

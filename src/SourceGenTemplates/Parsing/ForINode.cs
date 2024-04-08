@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using SourceGenTemplates.Parsing.BlockNodes;
+
 namespace SourceGenTemplates.Parsing;
 
 public class ForINode(IReadOnlyCollection<BlockNode> blocks, RangeNode range, IdentifierNode? identifier) : Node

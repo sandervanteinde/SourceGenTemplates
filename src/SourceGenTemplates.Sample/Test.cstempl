@@ -1,14 +1,15 @@
-﻿using System;
+﻿::foreach class in assembly as c;
+::filename c;
+using System;
 
-public class Test1
+public static class ::c::Hello
 {
-  public static void SayHello()
-  {
-    ::for 0..10 as i;
-    Console.WriteLine("Hello test! ::i::");
-    ::end;
-    ::foreach class in assembly as c;
-    Console.WriteLine("Class in file: ::c::");
-    ::end;
-  }
+    public static void SayHello()
+    {
+        ::for 1..10 as i;
+        Console.WriteLine("Hello ::i:: ::c::!");
+        ::end;
+    }
 }
+::end;
+

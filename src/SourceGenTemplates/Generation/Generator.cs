@@ -3,8 +3,11 @@ using System.Text;
 
 using Microsoft.CodeAnalysis;
 
+using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
+using SourceGenTemplates.Parsing.BlockNodes;
 using SourceGenTemplates.Parsing.Directives;
+using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 
 namespace SourceGenTemplates.Generation;
@@ -46,14 +49,8 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool GenerateDirectiveBlockNode(VariableInsertionBlockNode node)
     {
-        var value = _variables.GetOrThrow<object>(node.Identifier);
-
-        if (value is null)
-        {
-            throw new ParserException($"Variable with name {node.Identifier.Identifier} was not defined", node.Identifier);
-        }
-
-        _sb.Append(value);
+        var value = _variables.GetOrThrow(node.Identifier);
+        _sb.Append(value.GetCodeRepresentation());
         return true;
     }
 
@@ -70,18 +67,26 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
     private bool GenerateFileNameDirectiveNode(FileNameNode node)
     {
         OutputCurrentContentsToFile();
-        fileName = node.Identifier.Identifier.Identifier;
+        fileName = node.Expression.Type switch
+        {
+            ExpressionType.Identifier => _variables.GetOrThrow(((IdentifierExpressionNode)node.Expression).Identifier)
+                .GetCodeRepresentation(),
+            ExpressionType.String => ((StringExpressionNode)node.Expression).Value.Value,
+            ExpressionType.Number => throw new ParserException("Numbers are not valid file names", node.Expression.Token)
+        };
         return true;
     }
 
     private bool GenerateForeachDirectiveNode(ForeachNode node)
     {
         var identifier = node.Identifier;
+
         foreach (var @class in compilationContext.Classes)
         {
-            using var variableContext = _variables.AddVariableToContext(identifier?.Identifier, @class);
+            using var variableContext = _variables.AddVariableToContext(identifier?.Identifier, new ClassVariable(@class));
             GenerateBlocks(node.Blocks);
         }
+
         return true;
     }
 
@@ -92,7 +97,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
         for (var i = start; i < end; i++)
         {
-            using var variableContext = _variables.AddVariableToContext(node.Identifier?.Identifier, i);
+            using var variableContext = _variables.AddVariableToContext(node.Identifier?.Identifier, new ValueVariable(i));
             GenerateBlocks(node.Blocks);
         }
 

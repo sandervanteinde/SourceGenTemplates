@@ -15,5 +15,6 @@ public enum TokenType
     Class,
     Assembly,
     Foreach,
-    In
+    In,
+    String
 }

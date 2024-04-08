@@ -1,6 +1,8 @@
-﻿namespace SourceGenTemplates.Parsing;
+﻿using SourceGenTemplates.Parsing.Expressions;
 
-public class FileNameNode(IdentifierNode identifier) : Node
+namespace SourceGenTemplates.Parsing;
+
+public class FileNameNode(ExpressionNode expression) : Node
 {
-    public IdentifierNode Identifier => identifier;
+    public ExpressionNode Expression => expression;
 }

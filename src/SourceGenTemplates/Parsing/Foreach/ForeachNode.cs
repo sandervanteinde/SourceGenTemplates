@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using SourceGenTemplates.Parsing.BlockNodes;
+
 namespace SourceGenTemplates.Parsing.Foreach;
 
 public class ForeachNode(ForeachType foreachType, ForeachTarget target, IdentifierNode? identifier, IReadOnlyCollection<BlockNode> blocks) : Node

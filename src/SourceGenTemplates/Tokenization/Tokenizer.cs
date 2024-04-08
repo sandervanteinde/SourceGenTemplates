@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Microsoft.CodeAnalysis.Text;
 
 namespace SourceGenTemplates.Tokenization;
@@ -10,6 +9,7 @@ public class Tokenizer(SourceText sourceText)
     private readonly List<Token> _tokens = Parse(sourceText);
 
     private int _index;
+    public Token Last => _tokens[_tokens.Count - 1];
 
     public bool TryPeek(out Token? token)
     {
@@ -65,8 +65,7 @@ public class Tokenizer(SourceText sourceText)
             {
                 list.Add(contextSwitchToken!);
             }
-
-            if (inCodeContext)
+            else if (inCodeContext)
             {
                 list.Add(HandleCodeContext());
             }
@@ -76,7 +75,6 @@ public class Tokenizer(SourceText sourceText)
                 {
                     list.Add(token!);
                 }
-
             }
         } while (index < text.Length);
 
@@ -98,7 +96,7 @@ public class Tokenizer(SourceText sourceText)
 
             if (char.IsDigit(currentChar))
             {
-                while (char.IsDigit(span[0 + endIndex]))
+                while (char.IsDigit(span[endIndex]))
                 {
                     endIndex++;
                 }
@@ -115,6 +113,26 @@ public class Tokenizer(SourceText sourceText)
             {
                 var location = BumpBy(count: 2);
                 return new DoubleDotToken(location);
+            }
+
+            if (currentChar == '"')
+            {
+                var nextIndex = span
+                    .Slice(start: 1)
+                    .IndexOfAny(value0: '"', value1: '\n', value2: '\r');
+
+                if (nextIndex == -1 || span[nextIndex + 1] is not '"')
+                {
+                    var position = CurrentPosition();
+                    throw new ParserException("String has no matching close quote", new LinePositionSpan(position, position));
+                }
+
+                var location = BumpBy(nextIndex + 2);
+                var stringToken = new StringToken(
+                    location, span.Slice(start: 1, nextIndex)
+                        .ToString()
+                );
+                return stringToken;
             }
 
             if (!char.IsLetter(currentChar))
@@ -171,11 +189,6 @@ public class Tokenizer(SourceText sourceText)
                 var fullSourceText = text.Substring(index, textLength);
                 var position = BumpBy(textLength);
 
-                if (string.IsNullOrWhiteSpace(fullSourceText))
-                {
-                    token = null;
-                    return false;
-                }
                 SourceTextToken sourceTextToken = new(position, fullSourceText);
                 token = sourceTextToken;
                 return true;
@@ -194,12 +207,40 @@ public class Tokenizer(SourceText sourceText)
                 token = null;
                 return false;
             }
+
             var incrementIndex = 0;
 
-            while (char.IsWhiteSpace(span[index: 0]))
+            if (inCodeContext)
             {
-                incrementIndex++;
-                span = span.Slice(start: 1);
+                while (char.IsWhiteSpace(span[index: 0]))
+                {
+                    incrementIndex++;
+                    span = span.Slice(start: 1);
+                }
+            }
+
+            if (span[index: 0] == ';')
+            {
+                var position = BumpBy(1 + incrementIndex);
+                token = new CodeContextEndToken(position);
+                inCodeContext = false;
+                span = text.AsSpan()
+                    .Slice(index);
+
+                var increment = 0;
+
+                while (!span.IsEmpty && span[index: 0] is '\r' or '\n')
+                {
+                    increment++;
+                    span = span.Slice(start: 1);
+                }
+
+                if (increment > 0)
+                {
+                    BumpIndex(increment);
+                }
+
+                return true;
             }
 
             if (span.Length < 2)
@@ -213,29 +254,6 @@ public class Tokenizer(SourceText sourceText)
                 var position = BumpBy(2 + incrementIndex);
                 inCodeContext = !inCodeContext;
                 token = new CodeContextToken(position);
-                return true;
-            }
-
-            if (span[index: 0] == ';')
-            {
-                var position = BumpBy(1 + incrementIndex);
-                token = new CodeContextEndToken(position);
-                inCodeContext = false;
-                span = text.AsSpan()
-                    .Slice(index);
-
-                var increment = 0;
-                while (!span.IsEmpty && span[0] is '\r' or '\n')
-                {
-                    increment++;
-                    span = span.Slice(1);
-                }
-
-                if (increment > 0)
-                {
-                    BumpIndex(increment);
-                }
-
                 return true;
             }
 

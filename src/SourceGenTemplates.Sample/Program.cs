@@ -1,1 +1,2 @@
-﻿Test1.SayHello();
+﻿Test2Hello.SayHello();
+TesterHello.SayHello();

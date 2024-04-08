@@ -1,6 +1,6 @@
 ﻿using SourceGenTemplates.Tokenization;
 
-namespace SourceGenTemplates.Parsing;
+namespace SourceGenTemplates.Parsing.BlockNodes;
 
 public class CSharpBlockNode(SourceTextToken sourceText) : BlockNode
 {

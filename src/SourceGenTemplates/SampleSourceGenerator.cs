@@ -1,9 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-
 using SourceGenTemplates.Generation;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Tokenization;
@@ -60,7 +58,7 @@ public class SampleSourceGenerator : ISourceGenerator
                     Location.Create(additionalFile.Path, new TextSpan(start: 0, sourceText.Length), exception.LinePosition),
                     exception.Message
                 );
-                // context.ReportDiagnostic(diagnostic);
+                context.ReportDiagnostic(diagnostic);
             }
         }
     }

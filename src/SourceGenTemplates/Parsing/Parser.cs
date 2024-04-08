@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-
+using SourceGenTemplates.Parsing.BlockNodes;
 using SourceGenTemplates.Parsing.Directives;
+using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Tokenization;
 
@@ -62,7 +63,7 @@ public class Parser(Tokenizer tokenizer)
 
     private bool TryParseDirective(out DirectiveNode directiveNode)
     {
-        if (!tokenizer.TryPeek(1, out var token))
+        if (!tokenizer.TryPeek(offset: 1, out var token))
         {
             directiveNode = null!;
             return false;
@@ -70,11 +71,10 @@ public class Parser(Tokenizer tokenizer)
 
         if (token is FileNameToken)
         {
-            tokenizer.Consume(2);
-            var identifierToken = ConsumeExpectedToken<IdentifierToken>("Expected file name token to be followed by an identifier");
+            tokenizer.Consume(amount: 2);
+            var expression = ParseExpression();
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected for statement to end with ;");
-            IdentifierNode identifierNode = new(identifierToken);
-            FileNameNode fileNameNode = new(identifierNode);
+            FileNameNode fileNameNode = new(expression);
             directiveNode = new FileNameDirectiveNode(fileNameNode);
 
             return true;
@@ -82,7 +82,7 @@ public class Parser(Tokenizer tokenizer)
 
         if (token is ForToken)
         {
-            tokenizer.Consume(2);
+            tokenizer.Consume(amount: 2);
             var rangeToken = ParseRangeNode();
             IdentifierNode? identifier = null;
 
@@ -105,7 +105,7 @@ public class Parser(Tokenizer tokenizer)
 
         if (token is ForeachToken)
         {
-            tokenizer.Consume(2);
+            tokenizer.Consume(amount: 2);
             ConsumeExpectedToken<ClassToken>("Only classes are supported as foreach type");
             var foreachType = new ForeachTypeClass();
             ConsumeExpectedToken<InToken>("Expected 'in' keyword");
@@ -135,6 +135,18 @@ public class Parser(Tokenizer tokenizer)
         return false;
     }
 
+    private ExpressionNode ParseExpression()
+    {
+        var token = tokenizer.Consume();
+        return token.TokenType switch
+        {
+            TokenType.String => new StringExpressionNode((StringToken)token),
+            TokenType.Number => new NumberExpressionNode((NumberToken)token),
+            TokenType.Identifier => new IdentifierExpressionNode((IdentifierToken)token),
+            _ => throw new ParserException($"Token {token.TokenType} is not eligible for expressions", token)
+        };
+    }
+
     private IdentifierNode ParseIdentifierNode()
     {
         var identifierToken = ConsumeExpectedToken<IdentifierToken>("Expected identifier");
@@ -152,11 +164,16 @@ public class Parser(Tokenizer tokenizer)
 
     private TToken ConsumeExpectedToken<TToken>(string errorMessage)
     {
-        var token = tokenizer.Consume();
+        if (!tokenizer.TryPeek(out var token))
+        {
+            throw new ParserException(errorMessage, tokenizer.Last);
+        }
+
+        tokenizer.Consume();
 
         if (token is not TToken expectedToken)
         {
-            throw new ParserException(errorMessage, token);
+            throw new ParserException(errorMessage, token!);
         }
 
         return expectedToken;

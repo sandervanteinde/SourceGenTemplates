@@ -1,4 +1,4 @@
-﻿namespace SourceGenTemplates.Parsing;
+﻿namespace SourceGenTemplates.Parsing.BlockNodes;
 
 public abstract class BlockNode : Node
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Tokenization;
 
@@ -8,10 +9,9 @@ namespace SourceGenTemplates.Generation;
 
 public class VariableContext
 {
-    private readonly Dictionary<string, object> _variables = [];
+    private readonly Dictionary<string, Variable> _variables = [];
 
-    public IDisposable? AddVariableToContext<T>(IdentifierToken? identifier, T value)
-        where T : notnull
+    public IDisposable? AddVariableToContext(IdentifierToken? identifier, Variable variable)
     {
         if (identifier is null)
         {
@@ -19,13 +19,13 @@ public class VariableContext
         }
 
         string variableName = identifier.Identifier;
-        _variables[variableName] = value;
+        _variables[variableName] = variable;
         return new DisposeVariableName(this, variableName);
     }
 
-    public T GetOrThrow<T>(IdentifierToken identifier)
+    public Variable GetOrThrow(IdentifierToken identifier)
     {
-        var value = GetValue<T>(identifier.Identifier);
+        var value = GetValue(identifier.Identifier);
 
         if (value is null)
         {
@@ -35,19 +35,10 @@ public class VariableContext
         return value;
     }
     
-    public T? GetValue<T>(string variableName)
+    public Variable? GetValue(string variableName)
     {
-        if (!_variables.TryGetValue(variableName, out var variableValue))
-        {
-            return default;
-        }
-
-        if (variableValue is T value)
-        {
-            return value;
-        }
-        
-        return default;
+        _variables.TryGetValue(variableName, out var variableValue);
+        return variableValue;
     }
 
     private class DisposeVariableName(VariableContext context, string variableName) : IDisposable

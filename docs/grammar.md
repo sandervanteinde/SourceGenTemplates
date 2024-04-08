@@ -1,6 +1,6 @@
-# Language
+# Grammar
 
-Language described in [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+The grammar of source generator template language is described in [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
 
 ```ebnf
 file = { block }.

@@ -34,7 +34,7 @@ public class Tokenizer(SourceText sourceText)
     {
         if (!TryPeek(out var result))
         {
-            throw new ParserException("End of file", _tokens[_tokens.Count - 1]);
+            throw new ParserException("Unexpected end of file", _tokens[_tokens.Count - 1]);
         }
 
         _index++;

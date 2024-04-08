@@ -20,7 +20,7 @@ expression = identifier | string | number.
 
 string = """, { character } , """. (* A string with double quotes, e.g. "text" *)
 
-number = [-], digit, { digit }.
+number = digit, { digit }.
 
 for-i = "for", range, [ "as", identifier ], context-termination, 
     block, { block },

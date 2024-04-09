@@ -12,7 +12,7 @@ using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
-using SourceGenTemplates.Parsing.VariableInsertions;
+using SourceGenTemplates.Parsing.VariableExpressions;
 
 namespace SourceGenTemplates.Generation;
 
@@ -53,22 +53,22 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool GenerateDirectiveBlockNode(VariableInsertionBlockNode node)
     {
-        var variableInsertion = node.VariableInsertion;
+        var variableInsertion = node.VariableExpression;
         return variableInsertion.Type switch
         {
-            VariableInsertionNodeType.VariableAccess => GenerateVariableAccess((VariableInsertionNodeVariableAccess)variableInsertion),
-            VariableInsertionNodeType.PropertyAccess => GeneratePropertyAccess((VariableInsertionNodePropertyAccess)variableInsertion)
+            VariableInsertionNodeType.VariableAccess => GenerateVariableAccess((VariableExpressionNodeVariableAccess)variableInsertion),
+            VariableInsertionNodeType.PropertyAccess => GeneratePropertyAccess((VariableExpressionNodePropertyAccess)variableInsertion)
         };
     }
 
-    private bool GenerateVariableAccess(VariableInsertionNodeVariableAccess node)
+    private bool GenerateVariableAccess(VariableExpressionNodeVariableAccess node)
     {
         var value = _variables.GetOrThrow(node.Identifier);
         _sb.Append(value.GetCodeRepresentation());
         return true;
     }
 
-    private bool GeneratePropertyAccess(VariableInsertionNodePropertyAccess node)
+    private bool GeneratePropertyAccess(VariableExpressionNodePropertyAccess node)
     {
         var value = _variables.GetOrThrow(node.Identifier);
         value = InterpretPropertyAccess(value, node.PropertyAccess);

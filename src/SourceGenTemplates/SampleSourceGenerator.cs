@@ -49,7 +49,11 @@ public class SampleSourceGenerator : ISourceGenerator
             }
             catch (ParserException exception)
             {
+#if DEBUG
+                const DiagnosticSeverity severity = DiagnosticSeverity.Warning;
+#else
                 const DiagnosticSeverity severity = DiagnosticSeverity.Error;
+#endif
                 var diagnosticDescriptor = new DiagnosticDescriptor(
                     "sourcegentemplates001", "Invalid expression", "Parse error: {0}", "Design", severity, true
                 );

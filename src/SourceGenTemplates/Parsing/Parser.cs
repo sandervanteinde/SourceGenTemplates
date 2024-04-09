@@ -4,7 +4,7 @@ using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
-using SourceGenTemplates.Parsing.VariableInsertions;
+using SourceGenTemplates.Parsing.VariableExpressions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Parsing;
@@ -55,12 +55,12 @@ public class Parser(Tokenizer tokenizer)
             {
                 tokenizer.Consume(2);
                 var propertyAccess = TryParsePropertyAccessNode();
-                VariableInsertionNode variableInsertionNode = propertyAccess switch
+                VariableExpressionNode variableExpressionNode = propertyAccess switch
                 {
-                    null => new VariableInsertionNodeVariableAccess(identifierToken),
-                    not null => new VariableInsertionNodePropertyAccess(identifierToken, propertyAccess)
+                    null => new VariableExpressionNodeVariableAccess(identifierToken),
+                    not null => new VariableExpressionNodePropertyAccess(identifierToken, propertyAccess)
                 };
-                node = new VariableInsertionBlockNode(variableInsertionNode);
+                node = new VariableInsertionBlockNode(variableExpressionNode);
                 _ = ConsumeExpectedToken<CodeContextToken>("Expected variable insertion to end with ::");
                 return true;
             }

@@ -25,7 +25,7 @@ number = digit, { digit }.
 
 for-i = "for", range, [ "as", identifier ], context-termination, 
     block, { block },
-    context-switch, "end", context-terminationl
+    context-switch, "end", context-termination.
 
 foreach = "foreach", foreach-type, "in", foreach-target, 
     [ "where", foreach-condition ],
@@ -44,7 +44,7 @@ range = number, "..", number.
 
 identifier = letter, { letter | number }.
 
-variable-insertion = identifier
+variable-expression = identifier
     | (identifier, property_access).
 
 property-access = ".", identifier, [ property-access ]

@@ -1,4 +1,4 @@
-﻿namespace SourceGenTemplates.Parsing.VariableInsertions;
+﻿namespace SourceGenTemplates.Parsing.VariableExpressions;
 
 public enum VariableInsertionNodeType
 {

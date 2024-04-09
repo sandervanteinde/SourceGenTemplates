@@ -1,9 +1,9 @@
-﻿using SourceGenTemplates.Parsing.VariableInsertions;
+﻿using SourceGenTemplates.Parsing.VariableExpressions;
 
 namespace SourceGenTemplates.Parsing.BlockNodes;
 
-public class VariableInsertionBlockNode(VariableInsertionNode variableInsertion) : BlockNode
+public class VariableInsertionBlockNode(VariableExpressionNode variableExpression) : BlockNode
 {
-    public VariableInsertionNode VariableInsertion => variableInsertion;
+    public VariableExpressionNode VariableExpression => variableExpression;
     public override BlockNodeType Type => BlockNodeType.VariableInsertion;
 }

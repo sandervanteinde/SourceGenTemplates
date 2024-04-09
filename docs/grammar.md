@@ -4,12 +4,14 @@ The grammar of source generator template language is described
 in [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
 
 ```ebnf
+(* Spaces are always ignored unless stated otherwise *)
+
 file = { block }.
 
 block =
       csharp 
     | (context-switch, directive) 
-    | (context-switch, variable_insertion, context-switch).
+    | (context-switch, variable-expression, context-switch).
 
 csharp = ? any valid C# which is not parsed by the grammer and interpreted as is ?
 
@@ -45,7 +47,7 @@ range = number, "..", number.
 identifier = letter, { letter | number }.
 
 variable-expression = identifier
-    | (identifier, property_access).
+    | (identifier, property-access).
 
 property-access = ".", identifier, [ property-access ]
 

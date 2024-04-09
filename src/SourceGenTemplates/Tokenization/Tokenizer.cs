@@ -13,7 +13,7 @@ public class Tokenizer(SourceText sourceText)
 
     public bool TryPeek(out Token? token)
     {
-        return TryPeek(offset: 0, out token);
+        return TryPeek(0, out token);
     }
 
     public bool TryPeek(int offset, out Token? token)
@@ -85,13 +85,13 @@ public class Tokenizer(SourceText sourceText)
             var span = text.AsSpan()
                 .Slice(index);
 
-            while (span[index: 0] == ' ')
+            while (char.IsWhiteSpace(span[0]))
             {
                 BumpIndex();
-                span = span.Slice(start: 1);
+                span = span.Slice(1);
             }
 
-            var currentChar = span[index: 0];
+            var currentChar = span[0];
             var endIndex = 0;
 
             if (char.IsDigit(currentChar))
@@ -102,24 +102,24 @@ public class Tokenizer(SourceText sourceText)
                 }
 
                 var number = int.Parse(
-                    span.Slice(start: 0, endIndex)
+                    span.Slice(0, endIndex)
                         .ToString()
                 );
                 var position = BumpBy(endIndex);
                 return new NumberToken(position, number);
             }
 
-            if (currentChar == '.' && span.Length > 2 && span[index: 1] == '.')
+            if (currentChar == '.' && span.Length > 2 && span[1] == '.')
             {
-                var location = BumpBy(count: 2);
+                var location = BumpBy(2);
                 return new DoubleDotToken(location);
             }
 
             if (currentChar == '"')
             {
                 var nextIndex = span
-                    .Slice(start: 1)
-                    .IndexOfAny(value0: '"', value1: '\n', value2: '\r');
+                    .Slice(1)
+                    .IndexOfAny('"', '\n', '\r');
 
                 if (nextIndex == -1 || span[nextIndex + 1] is not '"')
                 {
@@ -129,7 +129,7 @@ public class Tokenizer(SourceText sourceText)
 
                 var location = BumpBy(nextIndex + 2);
                 var stringToken = new StringToken(
-                    location, span.Slice(start: 1, nextIndex)
+                    location, span.Slice(1, nextIndex)
                         .ToString()
                 );
                 return stringToken;
@@ -148,7 +148,7 @@ public class Tokenizer(SourceText sourceText)
                 endIndex++;
             }
 
-            var word = span.Slice(start: 0, endIndex)
+            var word = span.Slice(0, endIndex)
                 .ToString();
 
             var namePosition = BumpBy(endIndex);
@@ -172,10 +172,10 @@ public class Tokenizer(SourceText sourceText)
             var span = text.AsSpan(index);
             var textLength = 0;
 
-            while (span.Length < 2 || span[index: 0] != ':' || span[index: 1] != ':')
+            while (span.Length < 2 || span[0] != ':' || span[1] != ':')
             {
                 textLength++;
-                span = span.Slice(start: 1);
+                span = span.Slice(1);
 
                 if (span.Length == 1)
                 {
@@ -212,14 +212,14 @@ public class Tokenizer(SourceText sourceText)
 
             if (inCodeContext)
             {
-                while (char.IsWhiteSpace(span[index: 0]))
+                while (char.IsWhiteSpace(span[0]))
                 {
                     incrementIndex++;
-                    span = span.Slice(start: 1);
+                    span = span.Slice(1);
                 }
             }
 
-            if (span[index: 0] == ';')
+            if (span[0] == ';')
             {
                 var position = BumpBy(1 + incrementIndex);
                 token = new CodeContextEndToken(position);
@@ -229,10 +229,10 @@ public class Tokenizer(SourceText sourceText)
 
                 var increment = 0;
 
-                while (!span.IsEmpty && span[index: 0] is '\r' or '\n')
+                while (!span.IsEmpty && span[0] is '\r' or '\n')
                 {
                     increment++;
-                    span = span.Slice(start: 1);
+                    span = span.Slice(1);
                 }
 
                 if (increment > 0)
@@ -249,7 +249,7 @@ public class Tokenizer(SourceText sourceText)
                 return false;
             }
 
-            if (span[index: 0] == ':' && span[index: 1] == ':')
+            if (span[0] == ':' && span[1] == ':')
             {
                 var position = BumpBy(2 + incrementIndex);
                 inCodeContext = !inCodeContext;

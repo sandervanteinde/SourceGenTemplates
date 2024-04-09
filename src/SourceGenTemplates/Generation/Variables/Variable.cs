@@ -11,8 +11,8 @@ public abstract class Variable
 
 public class ValueVariable(object value) : Variable
 {
-
     public override VariableKind Kind => VariableKind.Value;
+
     public override string GetCodeRepresentation()
     {
         return value.ToString();

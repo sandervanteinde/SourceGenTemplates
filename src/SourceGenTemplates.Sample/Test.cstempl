@@ -1,4 +1,7 @@
-﻿::foreach class in assembly as c;
+﻿::foreach class 
+    in assembly 
+    as c;
+
 ::filename c;
 using System;
 

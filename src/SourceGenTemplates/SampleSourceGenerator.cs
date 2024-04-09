@@ -51,11 +51,11 @@ public class SampleSourceGenerator : ISourceGenerator
             {
                 const DiagnosticSeverity severity = DiagnosticSeverity.Error;
                 var diagnosticDescriptor = new DiagnosticDescriptor(
-                    "sourcegentemplates001", "Invalid expression", "Parse error: {0}", "Design", severity, isEnabledByDefault: true
+                    "sourcegentemplates001", "Invalid expression", "Parse error: {0}", "Design", severity, true
                 );
                 var diagnostic = Diagnostic.Create(
                     diagnosticDescriptor,
-                    Location.Create(additionalFile.Path, new TextSpan(start: 0, sourceText.Length), exception.LinePosition),
+                    Location.Create(additionalFile.Path, new TextSpan(0, sourceText.Length), exception.LinePosition),
                     exception.Message
                 );
                 context.ReportDiagnostic(diagnostic);

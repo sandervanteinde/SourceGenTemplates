@@ -1,7 +1,5 @@
 using System;
-
 using Microsoft.CodeAnalysis.Text;
-
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates;

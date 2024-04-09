@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using SourceGenTemplates.Parsing.BlockNodes;
 
 namespace SourceGenTemplates.Parsing;

@@ -47,11 +47,11 @@ public class Parser(Tokenizer tokenizer)
 
     private bool TryParseVariableInsertion(out VariableInsertionBlockNode? node)
     {
-        if (tokenizer.TryPeek(out var first) && tokenizer.TryPeek(offset: 1, out var second) && tokenizer.TryPeek(offset: 2, out var third))
+        if (tokenizer.TryPeek(out var first) && tokenizer.TryPeek(1, out var second) && tokenizer.TryPeek(2, out var third))
         {
             if (first!.TokenType == TokenType.CodeContextSwitch && third!.TokenType == TokenType.CodeContextSwitch && second is IdentifierToken identifierToken)
             {
-                tokenizer.Consume(amount: 3);
+                tokenizer.Consume(3);
                 node = new VariableInsertionBlockNode(identifierToken);
                 return true;
             }
@@ -63,7 +63,7 @@ public class Parser(Tokenizer tokenizer)
 
     private bool TryParseDirective(out DirectiveNode directiveNode)
     {
-        if (!tokenizer.TryPeek(offset: 1, out var token))
+        if (!tokenizer.TryPeek(1, out var token))
         {
             directiveNode = null!;
             return false;
@@ -71,7 +71,7 @@ public class Parser(Tokenizer tokenizer)
 
         if (token is FileNameToken)
         {
-            tokenizer.Consume(amount: 2);
+            tokenizer.Consume(2);
             var expression = ParseExpression();
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected for statement to end with ;");
             FileNameNode fileNameNode = new(expression);
@@ -82,7 +82,7 @@ public class Parser(Tokenizer tokenizer)
 
         if (token is ForToken)
         {
-            tokenizer.Consume(amount: 2);
+            tokenizer.Consume(2);
             var rangeToken = ParseRangeNode();
             IdentifierNode? identifier = null;
 
@@ -105,7 +105,7 @@ public class Parser(Tokenizer tokenizer)
 
         if (token is ForeachToken)
         {
-            tokenizer.Consume(amount: 2);
+            tokenizer.Consume(2);
             ConsumeExpectedToken<ClassToken>("Only classes are supported as foreach type");
             var foreachType = new ForeachTypeClass();
             ConsumeExpectedToken<InToken>("Expected 'in' keyword");

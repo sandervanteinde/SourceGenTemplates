@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using SourceGenTemplates.Generation.Variables;
-using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation;
@@ -18,7 +16,7 @@ public class VariableContext
             return null;
         }
 
-        string variableName = identifier.Identifier;
+        var variableName = identifier.Identifier;
         _variables[variableName] = variable;
         return new DisposeVariableName(this, variableName);
     }
@@ -31,10 +29,10 @@ public class VariableContext
         {
             throw new ParserException($"Variable with name {identifier.Identifier} was not defined", identifier);
         }
-        
+
         return value;
     }
-    
+
     public Variable? GetValue(string variableName)
     {
         _variables.TryGetValue(variableName, out var variableValue);

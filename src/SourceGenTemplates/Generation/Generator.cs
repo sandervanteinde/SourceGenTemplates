@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
-
 using Microsoft.CodeAnalysis;
-
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;

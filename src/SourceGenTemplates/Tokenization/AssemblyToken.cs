@@ -2,7 +2,4 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public class AssemblyToken(LinePositionSpan position) : Token(position)
-{
-    public override TokenType TokenType => TokenType.Assembly;
-}
+public class AssemblyToken(LinePositionSpan position) : Token(TokenType.Assembly, position);

@@ -1,6 +1,6 @@
 ﻿namespace SourceGenTemplates.Parsing.VariableExpressions;
 
-public enum VariableInsertionNodeType
+public enum VariableExpressionNodeType
 {
     VariableAccess,
     PropertyAccess

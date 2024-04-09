@@ -2,8 +2,7 @@
 
 namespace SourceGenTemplates.Parsing.BlockNodes;
 
-public class CSharpBlockNode(SourceTextToken sourceText) : BlockNode
+public class CSharpBlockNode(SourceTextToken sourceText) : BlockNode(BlockNodeType.CSharp)
 {
     public SourceTextToken SourceText => sourceText;
-    public override BlockNodeType Type => BlockNodeType.CSharp;
 }

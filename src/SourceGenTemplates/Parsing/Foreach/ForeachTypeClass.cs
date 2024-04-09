@@ -1,6 +1,3 @@
 ﻿namespace SourceGenTemplates.Parsing.Foreach;
 
-public class ForeachTypeClass : ForeachType
-{
-    public override ForEachTypeType Type => ForEachTypeType.Class;
-}
+public class ForeachTypeClass() : ForeachType(ForEachTypeType.Class);

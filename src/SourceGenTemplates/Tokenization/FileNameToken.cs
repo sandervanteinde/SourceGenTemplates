@@ -2,7 +2,4 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public class FileNameToken(LinePositionSpan position) : Token(position)
-{
-    public override TokenType TokenType => TokenType.FileNameDirective;
-}
+public class FileNameToken(LinePositionSpan position) : Token(TokenType.FileNameDirective, position);

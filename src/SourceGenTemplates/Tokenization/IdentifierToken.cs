@@ -2,8 +2,7 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public class IdentifierToken(LinePositionSpan position, string identifier) : Token(position)
+public class IdentifierToken(LinePositionSpan position, string identifier) : Token(TokenType.Identifier, position)
 {
     public string Identifier => identifier;
-    public override TokenType TokenType => TokenType.Identifier;
 }

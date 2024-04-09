@@ -2,8 +2,8 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public abstract class Token(LinePositionSpan position)
+public class Token(TokenType tokenType, LinePositionSpan position)
 {
-    public abstract TokenType TokenType { get; }
+    public TokenType TokenType => tokenType;
     public LinePositionSpan Position => position;
 }

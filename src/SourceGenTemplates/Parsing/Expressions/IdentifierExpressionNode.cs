@@ -2,9 +2,7 @@
 
 namespace SourceGenTemplates.Parsing.Expressions;
 
-public class IdentifierExpressionNode(IdentifierToken identifier) : ExpressionNode
+public class IdentifierExpressionNode(IdentifierToken identifier) : ExpressionNode(ExpressionType.Identifier, identifier)
 {
     public IdentifierToken Identifier => identifier;
-    public override ExpressionType Type => ExpressionType.Identifier;
-    public override Token Token => identifier;
 }

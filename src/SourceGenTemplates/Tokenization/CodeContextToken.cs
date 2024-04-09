@@ -2,7 +2,4 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public class CodeContextToken(LinePositionSpan position) : Token(position)
-{
-    public override TokenType TokenType => TokenType.CodeContextSwitch;
-}
+public class CodeContextToken(LinePositionSpan position) : Token(TokenType.CodeContextSwitch, position);

@@ -2,9 +2,7 @@
 
 namespace SourceGenTemplates.Parsing.Expressions;
 
-public class NumberExpressionNode(NumberToken value) : ExpressionNode
+public class NumberExpressionNode(NumberToken value) : ExpressionNode(ExpressionType.Number, value)
 {
     public NumberToken Value => value;
-    public override ExpressionType Type => ExpressionType.Number;
-    public override Token Token => value;
 }

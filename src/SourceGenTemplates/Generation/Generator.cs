@@ -56,8 +56,8 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         var variableInsertion = node.VariableExpression;
         return variableInsertion.Type switch
         {
-            VariableInsertionNodeType.VariableAccess => GenerateVariableAccess((VariableExpressionNodeVariableAccess)variableInsertion),
-            VariableInsertionNodeType.PropertyAccess => GeneratePropertyAccess((VariableExpressionNodePropertyAccess)variableInsertion)
+            VariableExpressionNodeType.VariableAccess => GenerateVariableAccess((VariableExpressionNodeVariableAccess)variableInsertion),
+            VariableExpressionNodeType.PropertyAccess => GeneratePropertyAccess((VariableExpressionNodePropertyAccess)variableInsertion)
         };
     }
 

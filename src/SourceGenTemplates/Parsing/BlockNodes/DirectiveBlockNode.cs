@@ -2,8 +2,7 @@
 
 namespace SourceGenTemplates.Parsing.BlockNodes;
 
-public class DirectiveBlockNode(DirectiveNode directive) : BlockNode
+public class DirectiveBlockNode(DirectiveNode directive) : BlockNode(BlockNodeType.Directive)
 {
     public DirectiveNode Directive => directive;
-    public override BlockNodeType Type => BlockNodeType.Directive;
 }

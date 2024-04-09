@@ -2,7 +2,4 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public class AsToken(LinePositionSpan position) : Token(position)
-{
-    public override TokenType TokenType => TokenType.As;
-}
+public class AsToken(LinePositionSpan position) : Token(TokenType.As, position);

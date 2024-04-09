@@ -1,6 +1,6 @@
 ﻿namespace SourceGenTemplates.Parsing.Directives;
 
-public abstract class DirectiveNode : Node
+public abstract class DirectiveNode(DirectiveNodeType type) : Node
 {
-    public abstract DirectiveNodeType Type { get; }
+    public DirectiveNodeType Type => type;
 }

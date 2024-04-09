@@ -2,8 +2,8 @@
 
 namespace SourceGenTemplates.Parsing.Expressions;
 
-public abstract class ExpressionNode
+public abstract class ExpressionNode(ExpressionType type, Token token)
 {
-    public abstract ExpressionType Type { get; }
-    public abstract Token Token { get; }
+    public ExpressionType Type => type;
+    public Token Token => token;
 }

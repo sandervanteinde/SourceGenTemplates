@@ -1,6 +1,6 @@
 ﻿namespace SourceGenTemplates.Parsing.Foreach;
 
-public abstract class ForeachTarget
+public abstract class ForeachTarget(ForeachTargetType type)
 {
-    public abstract ForeachTargetType Type { get; }
+    public ForeachTargetType Type => type;
 }

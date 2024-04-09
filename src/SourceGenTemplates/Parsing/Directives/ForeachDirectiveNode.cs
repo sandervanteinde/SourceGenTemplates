@@ -2,8 +2,7 @@
 
 namespace SourceGenTemplates.Parsing.Directives;
 
-public class ForeachDirectiveNode(ForeachNode foreachNode) : DirectiveNode
+public class ForeachDirectiveNode(ForeachNode foreachNode) : DirectiveNode(DirectiveNodeType.Foreach)
 {
     public ForeachNode ForeachNode => foreachNode;
-    public override DirectiveNodeType Type => DirectiveNodeType.Foreach;
 }

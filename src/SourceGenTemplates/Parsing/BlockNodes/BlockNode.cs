@@ -1,6 +1,6 @@
 ﻿namespace SourceGenTemplates.Parsing.BlockNodes;
 
-public abstract class BlockNode : Node
+public abstract class BlockNode(BlockNodeType type) : Node
 {
-    public abstract BlockNodeType Type { get; }
+    public BlockNodeType Type => type;
 }

@@ -3,7 +3,7 @@
 namespace SourceGenTemplates.Parsing.VariableExpressions;
 
 public class VariableExpressionNodePropertyAccess(IdentifierToken identifier, PropertyAccessNode propertyAccess)
-    : VariableExpressionNode(VariableInsertionNodeType.PropertyAccess)
+    : VariableExpressionNode(VariableExpressionNodeType.PropertyAccess)
 {
     public IdentifierToken Identifier => identifier;
     public PropertyAccessNode PropertyAccess => propertyAccess;

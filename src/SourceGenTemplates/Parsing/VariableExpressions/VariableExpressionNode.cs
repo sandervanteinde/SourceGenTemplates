@@ -1,6 +1,6 @@
 ﻿namespace SourceGenTemplates.Parsing.VariableExpressions;
 
-public abstract class VariableExpressionNode(VariableInsertionNodeType type)
+public abstract class VariableExpressionNode(VariableExpressionNodeType type)
 {
-    public VariableInsertionNodeType Type => type;
+    public VariableExpressionNodeType Type => type;
 }

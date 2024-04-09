@@ -16,5 +16,8 @@ public enum TokenType
     Assembly,
     Foreach,
     In,
-    String
+    String,
+    Where,
+    Partial,
+    Dot
 }

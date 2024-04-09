@@ -1,11 +1,14 @@
 ﻿::foreach class 
-    in assembly 
+    in assembly
+    where partial
     as c;
 
 ::filename c;
 using System;
 
-public static class ::c::Hello
+namespace ::c.Namespace::;
+
+partial class ::c::
 {
     public static void SayHello()
     {

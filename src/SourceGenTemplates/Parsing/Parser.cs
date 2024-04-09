@@ -3,6 +3,8 @@ using SourceGenTemplates.Parsing.BlockNodes;
 using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
+using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.VariableInsertions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Parsing;
@@ -47,18 +49,39 @@ public class Parser(Tokenizer tokenizer)
 
     private bool TryParseVariableInsertion(out VariableInsertionBlockNode? node)
     {
-        if (tokenizer.TryPeek(out var first) && tokenizer.TryPeek(1, out var second) && tokenizer.TryPeek(2, out var third))
+        if (tokenizer.TryPeek(out var first) && tokenizer.TryPeek(1, out var second))
         {
-            if (first!.TokenType == TokenType.CodeContextSwitch && third!.TokenType == TokenType.CodeContextSwitch && second is IdentifierToken identifierToken)
+            if (first!.TokenType == TokenType.CodeContextSwitch && second is IdentifierToken identifierToken)
             {
-                tokenizer.Consume(3);
-                node = new VariableInsertionBlockNode(identifierToken);
+                tokenizer.Consume(2);
+                var propertyAccess = TryParsePropertyAccessNode();
+                VariableInsertionNode variableInsertionNode = propertyAccess switch
+                {
+                    null => new VariableInsertionNodeVariableAccess(identifierToken),
+                    not null => new VariableInsertionNodePropertyAccess(identifierToken, propertyAccess)
+                };
+                node = new VariableInsertionBlockNode(variableInsertionNode);
+                _ = ConsumeExpectedToken<CodeContextToken>("Expected variable insertion to end with ::");
                 return true;
             }
         }
 
         node = null;
         return false;
+    }
+
+    private PropertyAccessNode? TryParsePropertyAccessNode()
+    {
+        if (!tokenizer.TryPeek(out var token) || token!.TokenType != TokenType.Dot)
+        {
+            return null;
+        }
+
+        tokenizer.Consume();
+        var identifierToken = ConsumeExpectedToken<IdentifierToken>("Expected property accessor to be followed by an identifier");
+
+        var furtherAccess = TryParsePropertyAccessNode();
+        return new PropertyAccessNode(identifierToken, furtherAccess);
     }
 
     private bool TryParseDirective(out DirectiveNode directiveNode)
@@ -113,6 +136,15 @@ public class Parser(Tokenizer tokenizer)
             var foreachTarget = new ForeachTargetAssembly();
             IdentifierNode? identifierNode = null;
 
+            ForeachConditionNode? conditionNode = null;
+
+            if (tokenizer.TryPeek(out var conditionToken) && conditionToken is WhereToken)
+            {
+                tokenizer.Consume();
+                _ = ConsumeExpectedToken<PartialToken>("Expected where clause to be followed by a partial token");
+                conditionNode = new PartialForEachConditionNode();
+            }
+
             if (tokenizer.TryPeek(out var asToken) && asToken is AsToken)
             {
                 tokenizer.Consume();
@@ -126,7 +158,7 @@ public class Parser(Tokenizer tokenizer)
             _ = ConsumeExpectedToken<CodeContextToken>("Expected ::end");
             _ = ConsumeExpectedToken<EndToken>("Expected ::end");
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
-            var foreachNode = new ForeachNode(foreachType, foreachTarget, identifierNode, blocks);
+            var foreachNode = new ForeachNode(foreachType, foreachTarget, identifierNode, blocks, conditionNode);
             directiveNode = new ForeachDirectiveNode(foreachNode);
             return true;
         }

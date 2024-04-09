@@ -1,9 +1,9 @@
-﻿using SourceGenTemplates.Tokenization;
+﻿using SourceGenTemplates.Parsing.VariableInsertions;
 
 namespace SourceGenTemplates.Parsing.BlockNodes;
 
-public class VariableInsertionBlockNode(IdentifierToken identifier) : BlockNode
+public class VariableInsertionBlockNode(VariableInsertionNode variableInsertion) : BlockNode
 {
-    public IdentifierToken Identifier => identifier;
+    public VariableInsertionNode VariableInsertion => variableInsertion;
     public override BlockNodeType Type => BlockNodeType.VariableInsertion;
 }

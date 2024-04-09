@@ -1,6 +1,6 @@
 ﻿namespace SourceGenTemplates.Sample;
 
-public class Tester
+public partial class Tester
 {
     public int String { get; set; }
 }

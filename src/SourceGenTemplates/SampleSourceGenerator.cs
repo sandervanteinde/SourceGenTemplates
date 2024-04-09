@@ -40,7 +40,7 @@ public class SampleSourceGenerator : ISourceGenerator
 
             try
             {
-                var tokenizer = new Tokenizer(sourceText);
+                var tokenizer = new Tokenizer(sourceText.ToString());
                 var initialFileName = Path.GetFileNameWithoutExtension(additionalFile.Path);
                 var parser = new Parser(tokenizer);
                 var file = parser.ParseFileNode();

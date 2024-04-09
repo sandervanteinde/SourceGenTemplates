@@ -1,12 +1,18 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;
 using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
+using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.VariableInsertions;
 
 namespace SourceGenTemplates.Generation;
 
@@ -47,9 +53,40 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool GenerateDirectiveBlockNode(VariableInsertionBlockNode node)
     {
+        var variableInsertion = node.VariableInsertion;
+        return variableInsertion.Type switch
+        {
+            VariableInsertionNodeType.VariableAccess => GenerateVariableAccess((VariableInsertionNodeVariableAccess)variableInsertion),
+            VariableInsertionNodeType.PropertyAccess => GeneratePropertyAccess((VariableInsertionNodePropertyAccess)variableInsertion)
+        };
+    }
+
+    private bool GenerateVariableAccess(VariableInsertionNodeVariableAccess node)
+    {
         var value = _variables.GetOrThrow(node.Identifier);
         _sb.Append(value.GetCodeRepresentation());
         return true;
+    }
+
+    private bool GeneratePropertyAccess(VariableInsertionNodePropertyAccess node)
+    {
+        var value = _variables.GetOrThrow(node.Identifier);
+        value = InterpretPropertyAccess(value, node.PropertyAccess);
+        _sb.Append(value.GetCodeRepresentation());
+        return true;
+    }
+
+    private Variable InterpretPropertyAccess(Variable variable, PropertyAccessNode propertyAccessNode)
+    {
+        var currentPropertyAccessNode = propertyAccessNode;
+
+        while (currentPropertyAccessNode is not null)
+        {
+            variable = variable.AccessProperty(propertyAccessNode.Identifier);
+            currentPropertyAccessNode = propertyAccessNode.PropertyAccess;
+        }
+
+        return variable;
     }
 
     private bool GenerateDirectiveBlockNode(DirectiveNode directive)
@@ -78,8 +115,15 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
     private bool GenerateForeachDirectiveNode(ForeachNode node)
     {
         var identifier = node.Identifier;
+        var type = node.Condition?.Type;
 
-        foreach (var @class in compilationContext.Classes)
+        Func<ClassDeclarationSyntax, bool> condition = type switch
+        {
+            ForeachConditionNodeType.Partial => @class => @class.Modifiers.Any(SyntaxKind.PartialKeyword),
+            null => _ => true
+        };
+
+        foreach (var @class in compilationContext.Classes.Where(condition))
         {
             using var variableContext = _variables.AddVariableToContext(identifier?.Identifier, new ClassVariable(@class));
             GenerateBlocks(node.Blocks);

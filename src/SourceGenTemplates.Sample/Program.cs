@@ -1,2 +1,3 @@
-﻿Test2Hello.SayHello();
-TesterHello.SayHello();
+﻿using System;
+
+Console.WriteLine("Hello");

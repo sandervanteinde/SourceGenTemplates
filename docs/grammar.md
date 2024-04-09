@@ -1,6 +1,7 @@
 # Grammar
 
-The grammar of source generator template language is described in [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+The grammar of source generator template language is described
+in [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
 
 ```ebnf
 file = { block }.
@@ -26,7 +27,10 @@ for-i = "for", range, [ "as", identifier ], context-termination,
     block, { block },
     context-switch, "end", context-terminationl
 
-foreach = "foreach", foreach-type, "in", foreach-target, [ "as", identifier ], context-termination,
+foreach = "foreach", foreach-type, "in", foreach-target, 
+    [ "where", foreach-condition ],
+    [ "as", identifier ],
+    context-termination, 
     block, { block },
     context-switch, "end", context-termination.
 
@@ -34,11 +38,16 @@ foreach-type = "class".
 
 foreach-target = "assembly".
 
+foreach-condition = "partial"
+
 range = number, "..", number.
 
 identifier = letter, { letter | number }.
 
-variable-insertion = identifier.
+variable-insertion = identifier
+    | (identifier, property_access).
+
+property-access = ".", identifier, [ property-access ]
 
 context-switch = "::".
 

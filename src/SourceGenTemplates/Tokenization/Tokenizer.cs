@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace SourceGenTemplates.Tokenization;
 
-public class Tokenizer(SourceText sourceText)
+public class Tokenizer(string sourceText)
 {
     private readonly List<Token> _tokens = Parse(sourceText);
 
@@ -50,9 +50,9 @@ public class Tokenizer(SourceText sourceText)
         }
     }
 
-    private static List<Token> Parse(SourceText sourceText)
+    private static List<Token> Parse(string sourceText)
     {
-        var text = sourceText.ToString();
+        var text = sourceText;
         var inCodeContext = false;
         var index = 0;
         var lineNumber = 0;
@@ -115,6 +115,11 @@ public class Tokenizer(SourceText sourceText)
                 return new DoubleDotToken(location);
             }
 
+            if (currentChar == '.')
+            {
+                return new DotToken(BumpBy(1));
+            }
+
             if (currentChar == '"')
             {
                 var nextIndex = span
@@ -163,6 +168,8 @@ public class Tokenizer(SourceText sourceText)
                 "class" => new ClassToken(namePosition),
                 "assembly" => new AssemblyToken(namePosition),
                 "in" => new InToken(namePosition),
+                "where" => new WhereToken(namePosition),
+                "partial" => new PartialToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }
@@ -172,16 +179,10 @@ public class Tokenizer(SourceText sourceText)
             var span = text.AsSpan(index);
             var textLength = 0;
 
-            while (span.Length < 2 || span[0] != ':' || span[1] != ':')
+            while (!span.IsEmpty && (span.Length < 2 || span[0] != ':' || span[1] != ':'))
             {
                 textLength++;
                 span = span.Slice(1);
-
-                if (span.Length == 1)
-                {
-                    textLength++;
-                    break;
-                }
             }
 
             if (textLength > 0)
@@ -217,30 +218,30 @@ public class Tokenizer(SourceText sourceText)
                     incrementIndex++;
                     span = span.Slice(1);
                 }
-            }
 
-            if (span[0] == ';')
-            {
-                var position = BumpBy(1 + incrementIndex);
-                token = new CodeContextEndToken(position);
-                inCodeContext = false;
-                span = text.AsSpan()
-                    .Slice(index);
-
-                var increment = 0;
-
-                while (!span.IsEmpty && span[0] is '\r' or '\n')
+                if (span[0] == ';')
                 {
-                    increment++;
-                    span = span.Slice(1);
-                }
+                    var position = BumpBy(1 + incrementIndex);
+                    token = new CodeContextEndToken(position);
+                    inCodeContext = false;
+                    span = text.AsSpan()
+                        .Slice(index);
 
-                if (increment > 0)
-                {
-                    BumpIndex(increment);
-                }
+                    var increment = 0;
 
-                return true;
+                    while (!span.IsEmpty && span[0] is '\r' or '\n')
+                    {
+                        increment++;
+                        span = span.Slice(1);
+                    }
+
+                    if (increment > 0)
+                    {
+                        BumpIndex(increment);
+                    }
+
+                    return true;
+                }
             }
 
             if (span.Length < 2)

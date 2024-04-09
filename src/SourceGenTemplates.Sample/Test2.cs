@@ -1,5 +1,5 @@
 ﻿namespace SourceGenTemplates.Sample;
 
-public class Test2
+public partial class Test2
 {
 }

@@ -1,6 +1,9 @@
-﻿namespace SourceGenTemplates.Parsing.VariableExpressions;
+﻿using SourceGenTemplates.Tokenization;
 
-public abstract class VariableExpressionNode(VariableExpressionNodeType type)
+namespace SourceGenTemplates.Parsing.VariableExpressions;
+
+public abstract class VariableExpressionNode(VariableExpressionNodeType type, Token token)
 {
     public VariableExpressionNodeType Type => type;
+    public Token Token => token;
 }

@@ -2,5 +2,6 @@
 
 public enum ForeachTargetType
 {
-    Assembly
+    Assembly,
+    VariableExpression
 }

@@ -41,12 +41,19 @@ public class Tokenizer(string sourceText)
         return result!;
     }
 
+    public void Return()
+    {
+        if (--_index < 0)
+        {
+            throw new ParserException("Attempted to rewind tokens to before the start of the file", _tokens[0]);
+        }
+    }
+
     public void Consume(int amount)
     {
-        while (amount > 0)
+        while (amount-- > 0)
         {
             Consume();
-            amount--;
         }
     }
 

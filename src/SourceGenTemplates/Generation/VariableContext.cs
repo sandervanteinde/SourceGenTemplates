@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SourceGenTemplates.Generation.Variables;
+using SourceGenTemplates.Parsing.VariableExpressions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation;
@@ -37,6 +38,29 @@ public class VariableContext
     {
         _variables.TryGetValue(variableName, out var variableValue);
         return variableValue;
+    }
+
+    public Variable GetOrThrow(VariableExpressionNode variableExpression)
+    {
+        return variableExpression.Type switch
+        {
+            VariableExpressionNodeType.VariableAccess => GetOrThrow(((VariableExpressionNodeVariableAccess)variableExpression).Identifier),
+            VariableExpressionNodeType.PropertyAccess => GetOrThrowPropertyAccess((VariableExpressionNodePropertyAccess)variableExpression)
+        };
+
+        Variable GetOrThrowPropertyAccess(VariableExpressionNodePropertyAccess propertyAccess)
+        {
+            var variable = GetOrThrow(propertyAccess.Identifier);
+            var currentPropertyAccess = propertyAccess.PropertyAccess;
+
+            while (currentPropertyAccess is not null)
+            {
+                variable = variable.AccessProperty(currentPropertyAccess.Identifier);
+                currentPropertyAccess = currentPropertyAccess.PropertyAccess;
+            }
+
+            return variable;
+        }
     }
 
     private class DisposeVariableName(VariableContext context, string variableName) : IDisposable

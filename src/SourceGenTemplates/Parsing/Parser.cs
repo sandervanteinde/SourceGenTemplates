@@ -49,25 +49,43 @@ public class Parser(Tokenizer tokenizer)
 
     private bool TryParseVariableInsertion(out VariableInsertionBlockNode? node)
     {
-        if (tokenizer.TryPeek(out var first) && tokenizer.TryPeek(1, out var second))
+        node = null;
+
+        if (!tokenizer.TryPeek(out var first) || first!.TokenType != TokenType.CodeContextSwitch)
         {
-            if (first!.TokenType == TokenType.CodeContextSwitch && second is IdentifierToken identifierToken)
-            {
-                tokenizer.Consume(2);
-                var propertyAccess = TryParsePropertyAccessNode();
-                VariableExpressionNode variableExpressionNode = propertyAccess switch
-                {
-                    null => new VariableExpressionNodeVariableAccess(identifierToken),
-                    not null => new VariableExpressionNodePropertyAccess(identifierToken, propertyAccess)
-                };
-                node = new VariableInsertionBlockNode(variableExpressionNode);
-                _ = ConsumeExpectedToken<CodeContextToken>("Expected variable insertion to end with ::");
-                return true;
-            }
+            return false;
         }
 
-        node = null;
-        return false;
+        tokenizer.Consume();
+
+        if (!TryParseVariableExpression(out var variableExpressionNode))
+        {
+            tokenizer.Return();
+            return false;
+        }
+
+        node = new VariableInsertionBlockNode(variableExpressionNode!);
+        _ = ConsumeExpectedToken<CodeContextToken>("Expected variable insertion to end with ::");
+        return true;
+    }
+
+    private bool TryParseVariableExpression(out VariableExpressionNode? variableExpressionNode)
+    {
+        if (!tokenizer.TryPeek(out var identifierTokenTypeCheck) || identifierTokenTypeCheck!.TokenType != TokenType.Identifier)
+        {
+            variableExpressionNode = null;
+            return false;
+        }
+
+        var identifierToken = ConsumeExpectedToken<IdentifierToken>("Expected identifier token");
+        var propertyAccess = TryParsePropertyAccessNode();
+
+        variableExpressionNode = propertyAccess switch
+        {
+            null => new VariableExpressionNodeVariableAccess(identifierToken),
+            not null => new VariableExpressionNodePropertyAccess(identifierToken, propertyAccess)
+        };
+        return true;
     }
 
     private PropertyAccessNode? TryParsePropertyAccessNode()
@@ -82,6 +100,16 @@ public class Parser(Tokenizer tokenizer)
 
         var furtherAccess = TryParsePropertyAccessNode();
         return new PropertyAccessNode(identifierToken, furtherAccess);
+    }
+
+    private ForeachTarget ParseForeachTarget()
+    {
+        if (TryParseVariableExpression(out var variableExpression))
+        {
+            return new ForeachTargetVariableExpression(variableExpression!);
+        }
+
+        return new ForeachTargetAssembly(ConsumeExpectedToken<AssemblyToken>("Expected variable expression or \"assembly\" as foreach target"));
     }
 
     private bool TryParseDirective(out DirectiveNode directiveNode)
@@ -132,8 +160,7 @@ public class Parser(Tokenizer tokenizer)
             ConsumeExpectedToken<ClassToken>("Only classes are supported as foreach type");
             var foreachType = new ForeachTypeClass();
             ConsumeExpectedToken<InToken>("Expected 'in' keyword");
-            ConsumeExpectedToken<AssemblyToken>("Only assemblies are supported as foreach target");
-            var foreachTarget = new ForeachTargetAssembly();
+            var foreachTarget = ParseForeachTarget();
             IdentifierNode? identifierNode = null;
 
             ForeachConditionNode? conditionNode = null;

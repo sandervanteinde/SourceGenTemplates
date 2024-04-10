@@ -21,12 +21,11 @@ public class Parser(Tokenizer tokenizer)
     {
         var result = new List<BlockNode>();
 
-        while (tokenizer.TryPeek(out var token))
+        while (tokenizer.HasMore)
         {
-            if (token is SourceTextToken sourceText)
+            if (tokenizer.ConsumeIfNextIs<SourceTextToken>(out var sourceText))
             {
                 result.Add(new CSharpBlockNode(sourceText));
-                tokenizer.Consume();
                 continue;
             }
 
@@ -51,12 +50,10 @@ public class Parser(Tokenizer tokenizer)
     {
         node = null;
 
-        if (!tokenizer.TryPeek(out var first) || first!.TokenType != TokenType.CodeContextSwitch)
+        if (!tokenizer.ConsumeIfNextIsOfType(TokenType.CodeContextSwitch))
         {
             return false;
         }
-
-        tokenizer.Consume();
 
         if (!TryParseVariableExpression(out var variableExpressionNode))
         {
@@ -90,12 +87,11 @@ public class Parser(Tokenizer tokenizer)
 
     private PropertyAccessNode? TryParsePropertyAccessNode()
     {
-        if (!tokenizer.TryPeek(out var token) || token!.TokenType != TokenType.Dot)
+        if (!tokenizer.ConsumeIfNextIsOfType(TokenType.Dot))
         {
             return null;
         }
 
-        tokenizer.Consume();
         var identifierToken = ConsumeExpectedToken<IdentifierToken>("Expected property accessor to be followed by an identifier");
 
         var furtherAccess = TryParsePropertyAccessNode();
@@ -137,9 +133,8 @@ public class Parser(Tokenizer tokenizer)
             var rangeToken = ParseRangeNode();
             IdentifierNode? identifier = null;
 
-            if (tokenizer.TryPeek(out var possibleAsToken) && possibleAsToken is AsToken)
+            if (tokenizer.ConsumeIfNextIsOfType(TokenType.As))
             {
-                tokenizer.Consume();
                 identifier = ParseIdentifierNode();
             }
 
@@ -162,16 +157,13 @@ public class Parser(Tokenizer tokenizer)
 
             ForeachConditionNode? conditionNode = null;
 
-            if (tokenizer.TryPeek(out var conditionToken) && conditionToken is WhereToken)
+            if (tokenizer.ConsumeIfNextIsOfType(TokenType.Where))
             {
-                tokenizer.Consume();
-                _ = ConsumeExpectedToken<PartialToken>("Expected where clause to be followed by a partial token");
-                conditionNode = new PartialForEachConditionNode();
+                conditionNode = ParseForeachConditionNode();
             }
 
-            if (tokenizer.TryPeek(out var asToken) && asToken is AsToken)
+            if (tokenizer.ConsumeIfNextIsOfType(TokenType.As))
             {
-                tokenizer.Consume();
                 var identifier = ConsumeExpectedToken<IdentifierToken>("Expected identifier after 'as'");
                 identifierNode = new IdentifierNode(identifier);
             }
@@ -189,6 +181,69 @@ public class Parser(Tokenizer tokenizer)
 
         directiveNode = null!;
         return false;
+    }
+
+    private ForeachConditionNode ParseForeachConditionNode()
+    {
+        if (TryParseAccessModifier(out var accessModifier))
+        {
+            return new AccessModifierForEachConditionNode(accessModifier!);
+        }
+
+        ConsumeExpectedToken<PartialToken>("Invalid where expression");
+        return new PartialForEachConditionNode();
+    }
+
+    private bool TryParseAccessModifier(out AccessModifierNode? node)
+    {
+        if (!tokenizer.TryPeek(out var currentNode))
+        {
+            node = null;
+            return false;
+        }
+
+        var tokenType = currentNode!.TokenType;
+
+        switch (tokenType)
+        {
+            case TokenType.Public:
+                return ConsumeAndReturn(AccessModifierType.Public, out node);
+            case TokenType.Internal:
+                return !IsNextTokenType(TokenType.Protected)
+                    ? ConsumeAndReturn(AccessModifierType.Internal, out node)
+                    : ConsumeTwoAndReturn(AccessModifierType.ProtectedInternal, out node);
+            case TokenType.Protected when IsNextTokenType(TokenType.Internal):
+                return ConsumeTwoAndReturn(AccessModifierType.ProtectedInternal, out node);
+            case TokenType.Protected:
+                return IsNextTokenType(TokenType.Private)
+                    ? ConsumeTwoAndReturn(AccessModifierType.PrivateProtected, out node)
+                    : ConsumeAndReturn(AccessModifierType.Private, out node);
+            case TokenType.Private:
+                return IsNextTokenType(TokenType.Protected)
+                    ? ConsumeTwoAndReturn(AccessModifierType.PrivateProtected, out node)
+                    : ConsumeAndReturn(AccessModifierType.Private, out node);
+            default:
+                node = null!;
+                return false;
+        }
+
+        bool ConsumeTwoAndReturn(AccessModifierType type, out AccessModifierNode nodeReturn)
+        {
+            tokenizer.Consume();
+            return ConsumeAndReturn(type, out nodeReturn);
+        }
+
+        bool ConsumeAndReturn(AccessModifierType type, out AccessModifierNode nodeReturn)
+        {
+            tokenizer.Consume();
+            nodeReturn = new AccessModifierNode(type);
+            return true;
+        }
+
+        bool IsNextTokenType(TokenType expectedTokenType)
+        {
+            return tokenizer.TryPeek(1, out var next) && next!.TokenType == expectedTokenType;
+        }
     }
 
     private ExpressionNode ParseExpression()

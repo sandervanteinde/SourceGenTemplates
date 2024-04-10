@@ -2,5 +2,6 @@
 
 public enum ForeachConditionNodeType
 {
-    Partial
+    Partial,
+    AccessModifier
 }

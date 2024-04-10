@@ -13,18 +13,17 @@ public class ParserTests
     {
         // ARRANGE
         var code = """
-           ::foreach class
-               in assembly
-               where partial
-               as c;
-           ::end;
-           """;
+                   ::foreach class
+                       where partial
+                       as c;
+                   ::end;
+                   """;
         var tokenizer = new Tokenizer(code);
         var generator = new Parser(tokenizer);
 
         // ACT
         var fileNode = generator.ParseFileNode();
-        
+
         // ASSERT
         fileNode.Blocks.Should()
             .ContainSingle()
@@ -35,6 +34,5 @@ public class ParserTests
             .Directive
             .Should()
             .BeOfType<ForeachDirectiveNode>();
-
     }
 }

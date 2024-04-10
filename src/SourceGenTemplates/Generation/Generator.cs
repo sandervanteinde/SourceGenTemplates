@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;
@@ -87,7 +85,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         {
             throw new ParserException("Foreach target points to a variable which is not a collection", node.ForeachTarget.Token);
         }
-        
+
         var variableCollection = (VariableCollection)variable;
 
         if (node.Condition is not null)

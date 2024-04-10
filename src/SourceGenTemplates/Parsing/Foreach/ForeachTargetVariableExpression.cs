@@ -4,7 +4,8 @@ using SourceGenTemplates.Parsing.VariableExpressions;
 
 namespace SourceGenTemplates.Parsing.Foreach;
 
-public class ForeachTargetVariableExpression(VariableExpressionNode variableExpression) : ForeachTarget(ForeachTargetType.VariableExpression, variableExpression.Token)
+public class ForeachTargetVariableExpression(VariableExpressionNode variableExpression)
+    : ForeachTarget(ForeachTargetType.VariableExpression, variableExpression.Token)
 {
     public VariableExpressionNode VariableExpression => variableExpression;
 

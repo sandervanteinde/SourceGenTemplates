@@ -13,7 +13,11 @@ public class PropertyVariable(PropertyDeclarationSyntax property) : Variable(Var
 
     public override bool MatchesCondition(ForeachConditionNode foreachCondition)
     {
-        return false;
+        return foreachCondition.Type switch
+        {
+            ForeachConditionNodeType.Partial => false,
+            ForeachConditionNodeType.AccessModifier => ((AccessModifierForEachConditionNode)foreachCondition).AccessModifier.IsApplicableFor(property.Modifiers)
+        };
     }
 
     protected override Variable? TryAccessProperty(IdentifierToken identifier)

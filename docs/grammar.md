@@ -38,7 +38,7 @@ foreach = "foreach", foreach-target,
 
 foreach-target = "assembly" | variable-expression. (* variable-expression must be pointing to a valid collection *)
 
-foreach-condition = "partial"
+foreach-condition = "partial" | access_modifier
 
 range = number, "..", number.
 
@@ -50,5 +50,7 @@ variable-expression = identifier
 property-access = ".", identifier, [ property-access ]
 
 context-switch = "::".
+
+access_modifier: "public" | "private" | "protected" | "internal" | ("protected", "internal") | ("private", "protected")
 
 context-termination = ";".

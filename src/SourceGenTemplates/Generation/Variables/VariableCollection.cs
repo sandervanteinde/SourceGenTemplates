@@ -25,11 +25,10 @@ public class VariableCollection(IReadOnlyCollection<Variable> variables) : Varia
         var newVariables = variables
             .Where(variable => variable.MatchesCondition(condition))
             .ToList();
-        
-        
+
         return new VariableCollection(newVariables);
     }
-    
+
     protected override Variable? TryAccessProperty(IdentifierToken identifier)
     {
         return null;

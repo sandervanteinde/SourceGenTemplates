@@ -11,9 +11,36 @@ public class Tokenizer(string sourceText)
     private int _index;
     public Token Last => _tokens[_tokens.Count - 1];
 
+    public bool HasMore => _index < _tokens.Count;
+
     public bool TryPeek(out Token? token)
     {
         return TryPeek(0, out token);
+    }
+
+    public bool ConsumeIfNextIsOfType(TokenType type)
+    {
+        if (TryPeek(out var token) && token!.TokenType == type)
+        {
+            Consume();
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool ConsumeIfNextIs<TExpected>(out TExpected expectedNode)
+        where TExpected : Token
+    {
+        if (TryPeek(out var token) && token is TExpected expected)
+        {
+            expectedNode = expected;
+            Consume();
+            return true;
+        }
+
+        expectedNode = default!;
+        return false;
     }
 
     public bool TryPeek(int offset, out Token? token)
@@ -175,6 +202,10 @@ public class Tokenizer(string sourceText)
                 "class" => new ClassToken(namePosition),
                 "where" => new WhereToken(namePosition),
                 "partial" => new PartialToken(namePosition),
+                "public" => new PublicToken(namePosition),
+                "private" => new PrivateToken(namePosition),
+                "protected" => new ProtectedToken(namePosition),
+                "internal" => new InternalToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }

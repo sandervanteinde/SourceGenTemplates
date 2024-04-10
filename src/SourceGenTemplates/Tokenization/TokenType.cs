@@ -17,5 +17,9 @@ public enum TokenType
     String,
     Where,
     Partial,
-    Dot
+    Dot,
+    Public,
+    Private,
+    Protected,
+    Internal
 }

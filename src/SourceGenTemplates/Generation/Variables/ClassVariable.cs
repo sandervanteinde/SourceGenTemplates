@@ -19,7 +19,8 @@ public class ClassVariable(ClassDeclarationSyntax @class) : Variable(VariableKin
     {
         return foreachCondition.Type switch
         {
-            ForeachConditionNodeType.Partial => @class.Modifiers.Any(SyntaxKind.PartialKeyword)
+            ForeachConditionNodeType.Partial => @class.Modifiers.Any(SyntaxKind.PartialKeyword),
+            ForeachConditionNodeType.AccessModifier => ((AccessModifierForEachConditionNode)foreachCondition).AccessModifier.IsApplicableFor(@class.Modifiers)
         };
     }
 
@@ -28,18 +29,18 @@ public class ClassVariable(ClassDeclarationSyntax @class) : Variable(VariableKin
         return identifier.Identifier switch
         {
             "Namespace" => new NamespaceVariable(FindNamespace()),
-            "Properties" => GetProperties(), 
+            "Properties" => GetProperties(),
             _ => null
         };
     }
 
     private VariableCollection GetProperties()
     {
-        var properties =  @class.Members
+        var properties = @class.Members
             .OfType<PropertyDeclarationSyntax>()
             .Select(property => new PropertyVariable(property))
             .ToList();
-        
+
         return new VariableCollection(properties);
     }
 

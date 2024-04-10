@@ -11,7 +11,9 @@ partial class ::c::
 {
     public static void SayHello()
     {
-        ::foreach c.Properties as p;
+        ::foreach c.Properties
+            where internal
+            as p;
         Console.WriteLine("Property ::p::");
         ::end;
     }

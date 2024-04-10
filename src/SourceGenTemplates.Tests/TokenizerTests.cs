@@ -11,7 +11,6 @@ public class TokenizerTests
         // ARRANGE
         var code = """
                    ::foreach class
-                       in assembly
                        where partial
                        as c;
                    """;
@@ -26,8 +25,6 @@ public class TokenizerTests
                 TokenType<CodeContextToken>(),
                 TokenType<ForeachToken>(),
                 TokenType<ClassToken>(),
-                TokenType<InToken>(),
-                TokenType<AssemblyToken>(),
                 TokenType<WhereToken>(),
                 TokenType<PartialToken>(),
                 TokenType<AsToken>(),

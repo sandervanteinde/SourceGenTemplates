@@ -81,7 +81,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
     {
         var identifier = node.Identifier;
 
-        var variable = node.ForeachTarget.GetVariableForType(node.ForeachType, compilationContext, _variables);
+        var variable = node.ForeachTarget.GetVariableForType(compilationContext, _variables);
 
         if (variable.Kind is not VariableKind.Collection)
         {
@@ -89,8 +89,6 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         }
         
         var variableCollection = (VariableCollection)variable;
-        ClassDeclarationSyntax @class = null!;
-        @class.Modifiers.Any(SyntaxKind.PartialKeyword);
 
         if (node.Condition is not null)
         {

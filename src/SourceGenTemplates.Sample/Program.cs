@@ -1,3 +1,4 @@
 ﻿using System;
+using SourceGenTemplates.Sample;
 
-Console.WriteLine("Hello");
+Tester.SayHello();;

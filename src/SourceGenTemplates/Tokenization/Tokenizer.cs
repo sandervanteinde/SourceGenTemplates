@@ -173,8 +173,6 @@ public class Tokenizer(string sourceText)
                 "as" => new AsToken(namePosition),
                 "foreach" => new ForeachToken(namePosition),
                 "class" => new ClassToken(namePosition),
-                "assembly" => new AssemblyToken(namePosition),
-                "in" => new InToken(namePosition),
                 "where" => new WhereToken(namePosition),
                 "partial" => new PartialToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)

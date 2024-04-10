@@ -9,5 +9,5 @@ public abstract class ForeachTarget(ForeachTargetType type, Token token)
     public ForeachTargetType Type => type;
     public Token Token => token;
 
-    public abstract Variable GetVariableForType(ForeachType type, CompilationContext compilation, VariableContext variables);
+    public abstract Variable GetVariableForType(CompilationContext compilation, VariableContext variables);
 }

@@ -1,5 +1,4 @@
-﻿::foreach class 
-    in assembly
+﻿::foreach class
     where partial
     as c;
 
@@ -12,8 +11,8 @@ partial class ::c::
 {
     public static void SayHello()
     {
-        ::for 1..10 as i;
-        Console.WriteLine("Hello ::i:: ::c::!");
+        ::foreach c.Properties as p;
+        Console.WriteLine("Property ::p::");
         ::end;
     }
 }

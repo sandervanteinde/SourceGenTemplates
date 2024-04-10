@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,9 +25,22 @@ public class ClassVariable(ClassDeclarationSyntax @class) : Variable(VariableKin
 
     protected override Variable? TryAccessProperty(IdentifierToken identifier)
     {
-        return identifier.Identifier == "Namespace"
-            ? new NamespaceVariable(FindNamespace())
-            : null;
+        return identifier.Identifier switch
+        {
+            "Namespace" => new NamespaceVariable(FindNamespace()),
+            "Properties" => GetProperties(), 
+            _ => null
+        };
+    }
+
+    private VariableCollection GetProperties()
+    {
+        var properties =  @class.Members
+            .OfType<PropertyDeclarationSyntax>()
+            .Select(property => new PropertyVariable(property))
+            .ToList();
+        
+        return new VariableCollection(properties);
     }
 
     private BaseNamespaceDeclarationSyntax FindNamespace()

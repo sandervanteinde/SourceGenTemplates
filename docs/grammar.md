@@ -29,15 +29,12 @@ for-i = "for", range, [ "as", identifier ], context-termination,
     block, { block },
     context-switch, "end", context-termination.
 
-foreach = "foreach", foreach-type,
-    "in", foreach-target, 
+foreach = "foreach", foreach-target, 
     [ "where", foreach-condition ],
     [ "as", identifier ],
     context-termination, 
     block, { block },
     context-switch, "end", context-termination.
-
-foreach-type = "class".
 
 foreach-target = "assembly" | variable-expression. (* variable-expression must be pointing to a valid collection *)
 

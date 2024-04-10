@@ -109,7 +109,7 @@ public class Parser(Tokenizer tokenizer)
             return new ForeachTargetVariableExpression(variableExpression!);
         }
 
-        return new ForeachTargetAssembly(ConsumeExpectedToken<AssemblyToken>("Expected variable expression or \"assembly\" as foreach target"));
+        return new ForeachTargetClass(ConsumeExpectedToken<ClassToken>("Expected variable expression or \"class\" as foreach target"));
     }
 
     private bool TryParseDirective(out DirectiveNode directiveNode)
@@ -157,9 +157,6 @@ public class Parser(Tokenizer tokenizer)
         if (token is ForeachToken)
         {
             tokenizer.Consume(2);
-            ConsumeExpectedToken<ClassToken>("Only classes are supported as foreach type");
-            var foreachType = new ForeachTypeClass();
-            ConsumeExpectedToken<InToken>("Expected 'in' keyword");
             var foreachTarget = ParseForeachTarget();
             IdentifierNode? identifierNode = null;
 
@@ -185,7 +182,7 @@ public class Parser(Tokenizer tokenizer)
             _ = ConsumeExpectedToken<CodeContextToken>("Expected ::end");
             _ = ConsumeExpectedToken<EndToken>("Expected ::end");
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
-            var foreachNode = new ForeachNode(foreachType, foreachTarget, identifierNode, blocks, conditionNode);
+            var foreachNode = new ForeachNode(foreachTarget, identifierNode, blocks, conditionNode);
             directiveNode = new ForeachDirectiveNode(foreachNode);
             return true;
         }

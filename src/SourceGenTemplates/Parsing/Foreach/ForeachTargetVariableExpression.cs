@@ -8,7 +8,7 @@ public class ForeachTargetVariableExpression(VariableExpressionNode variableExpr
 {
     public VariableExpressionNode VariableExpression => variableExpression;
 
-    public override Variable GetVariableForType(ForeachType type, CompilationContext compilation, VariableContext variables)
+    public override Variable GetVariableForType(CompilationContext compilation, VariableContext variables)
     {
         return variables.GetOrThrow(variableExpression);
     }

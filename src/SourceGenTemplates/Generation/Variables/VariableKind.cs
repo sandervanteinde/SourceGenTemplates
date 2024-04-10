@@ -5,5 +5,6 @@ public enum VariableKind
     Value,
     Class,
     Namespace,
-    Collection
+    Collection,
+    Property
 }

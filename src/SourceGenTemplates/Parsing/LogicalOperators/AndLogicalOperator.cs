@@ -9,21 +9,14 @@ public class AndLogicalOperator(ForeachConditionNode left, ForeachConditionNode 
     public ForeachConditionNode Left => left;
     public ForeachConditionNode Right => right;
 
+    public override int Precedence => 2;
+
     protected internal override void AppendDebugString(StringBuilder sb)
     {
+        sb.Append('(');
         left.AppendDebugString(sb);
         sb.Append(" and ");
         right.AppendDebugString(sb);
-    }
-}
-
-public class NotLogicalOperator(ForeachConditionNode condition) : LogicalOperator(LogicalOperatorType.Not)
-{
-    public ForeachConditionNode Condition => condition;
-
-    protected internal override void AppendDebugString(StringBuilder sb)
-    {
-        sb.Append("not ");
-        condition.AppendDebugString(sb);
+        sb.Append(')');
     }
 }

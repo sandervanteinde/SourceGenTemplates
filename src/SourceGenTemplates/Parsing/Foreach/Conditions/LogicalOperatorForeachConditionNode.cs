@@ -9,6 +9,8 @@ public class LogicalOperatorForeachConditionNode(LogicalOperator logicalOperator
 {
     public LogicalOperator LogicalOperator => logicalOperator;
 
+    public override int Precedence => logicalOperator.Precedence;
+
     protected internal override void AppendDebugString(StringBuilder sb)
     {
         logicalOperator.AppendDebugString(sb);

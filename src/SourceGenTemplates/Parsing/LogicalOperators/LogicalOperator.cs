@@ -3,4 +3,5 @@
 public abstract class LogicalOperator(LogicalOperatorType type) : Node
 {
     public LogicalOperatorType Type => type;
+    public abstract int Precedence { get; }
 }

@@ -8,6 +8,8 @@ public class AccessModifierForEachConditionNode(AccessModifierNode accessModifie
 {
     public AccessModifierNode AccessModifier => accessModifier;
 
+    public override int Precedence => 0;
+
     protected internal override void AppendDebugString(StringBuilder sb)
     {
         accessModifier.AppendDebugString(sb);

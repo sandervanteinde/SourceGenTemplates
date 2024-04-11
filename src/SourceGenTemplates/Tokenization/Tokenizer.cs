@@ -213,6 +213,7 @@ public class Tokenizer(string sourceText)
                 "internal" => new InternalToken(namePosition),
                 "and" => new AndToken(namePosition),
                 "or" => new OrToken(namePosition),
+                "not" => new NotToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }

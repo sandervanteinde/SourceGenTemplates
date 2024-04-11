@@ -186,6 +186,12 @@ public class Parser(Tokenizer tokenizer)
 
     private ForeachConditionNode ParseForeachConditionNode()
     {
+        if (tokenizer.ConsumeIfNextIsOfType(TokenType.Not, out var notToken))
+        {
+            var op = ParseForeachConditionNode();
+            var logicalOperator = new NotLogicalOperator(op);
+            return new LogicalOperatorForeachConditionNode(logicalOperator, notToken);
+        }
         var left = GetNodeFromTokenizer();
 
         if (tokenizer.ConsumeIfNextIsOfType(TokenType.Or, out var orToken))

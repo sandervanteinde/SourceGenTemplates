@@ -40,10 +40,11 @@ foreach_target = "assembly" | variable_expression. (* variable_expression must b
 
 foreach_condition = "partial" | access_modifier | logical_operator.
 
-logical_operator = or_operator | and_operator.
+logical_operator = or_operator | and_operator | not_operator.
 
 or_operator = foreach_condition, "or", foreach_condition.
 and_operator = foreach_condition, "and", foreach_condition.
+not_operator = "not", foreach_condition.
 
 range = number, "..", number.
 

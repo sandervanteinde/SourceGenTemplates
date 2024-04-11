@@ -16,3 +16,14 @@ public class AndLogicalOperator(ForeachConditionNode left, ForeachConditionNode 
         right.AppendDebugString(sb);
     }
 }
+
+public class NotLogicalOperator(ForeachConditionNode condition) : LogicalOperator(LogicalOperatorType.Not)
+{
+    public ForeachConditionNode Condition => condition;
+
+    protected internal override void AppendDebugString(StringBuilder sb)
+    {
+        sb.Append("not ");
+        condition.AppendDebugString(sb);
+    }
+}

@@ -37,8 +37,14 @@ public abstract class Variable(VariableKind kind)
         return op.Type switch
         {
             LogicalOperatorType.Or => OrOperator((OrLogicalOperator)op),
-            LogicalOperatorType.And => AndOperator((AndLogicalOperator)op)
+            LogicalOperatorType.And => AndOperator((AndLogicalOperator)op),
+            LogicalOperatorType.Not => NotOperator((NotLogicalOperator)op),
         };
+
+        bool NotOperator(NotLogicalOperator not)
+        {
+            return !MatchesCondition(not.Condition);
+        }
 
         bool OrOperator(OrLogicalOperator or)
         {

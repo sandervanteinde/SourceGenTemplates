@@ -3,5 +3,6 @@
 public enum LogicalOperatorType
 {
     Or,
-    And
+    And,
+    Not
 }

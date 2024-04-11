@@ -23,5 +23,6 @@ public enum TokenType
     Protected,
     Internal,
     Or,
-    And
+    And,
+    Not
 }

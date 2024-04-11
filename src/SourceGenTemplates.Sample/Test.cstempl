@@ -12,11 +12,10 @@ partial class ::c::
     public static void SayHello()
     {
         ::foreach c.Properties
-            where internal or public or protected
+            where not private
             as p;
         Console.WriteLine("Property ::p::");
         ::end;
     }
 }
 ::end;
-

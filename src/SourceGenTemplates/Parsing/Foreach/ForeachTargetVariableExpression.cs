@@ -1,4 +1,5 @@
-﻿using SourceGenTemplates.Generation;
+﻿using System.Text;
+using SourceGenTemplates.Generation;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing.VariableExpressions;
 
@@ -12,5 +13,10 @@ public class ForeachTargetVariableExpression(VariableExpressionNode variableExpr
     public override Variable GetVariableForType(CompilationContext compilation, VariableContext variables)
     {
         return variables.GetOrThrow(variableExpression);
+    }
+
+    protected internal override void AppendDebugString(StringBuilder sb)
+    {
+        variableExpression.AppendDebugString(sb);
     }
 }

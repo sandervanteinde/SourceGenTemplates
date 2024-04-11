@@ -21,5 +21,7 @@ public enum TokenType
     Public,
     Private,
     Protected,
-    Internal
+    Internal,
+    Or,
+    And
 }

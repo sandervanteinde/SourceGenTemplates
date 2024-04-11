@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using SourceGenTemplates.Generation;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Tokenization;
@@ -13,5 +14,10 @@ public class ForeachTargetClass(ClassToken token) : ForeachTarget(ForeachTargetT
             .Select(c => new ClassVariable(c))
             .ToList();
         return new VariableCollection(allClasses);
+    }
+
+    protected internal override void AppendDebugString(StringBuilder sb)
+    {
+        sb.Append("class");
     }
 }

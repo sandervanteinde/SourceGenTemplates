@@ -11,7 +11,7 @@ public class PropertyVariable(PropertyDeclarationSyntax property) : Variable(Var
         return property.Identifier.ToString();
     }
 
-    public override bool MatchesCondition(ForeachConditionNode foreachCondition)
+    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
     {
         return foreachCondition.Type switch
         {

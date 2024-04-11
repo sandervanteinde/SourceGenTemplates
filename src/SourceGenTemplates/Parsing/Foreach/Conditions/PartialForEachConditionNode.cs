@@ -1,3 +1,12 @@
-﻿namespace SourceGenTemplates.Parsing.Foreach.Conditions;
+﻿using System.Text;
+using SourceGenTemplates.Tokenization;
 
-public class PartialForEachConditionNode() : ForeachConditionNode(ForeachConditionNodeType.Partial);
+namespace SourceGenTemplates.Parsing.Foreach.Conditions;
+
+public class PartialForEachConditionNode(Token token) : LogicalOperationForeachCondition(ForeachConditionNodeType.Partial, token)
+{
+    protected internal override void AppendDebugString(StringBuilder sb)
+    {
+        sb.Append("partial");
+    }
+}

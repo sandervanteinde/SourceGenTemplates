@@ -8,19 +8,21 @@ using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation.Variables;
 
-public class ClassVariable(ClassDeclarationSyntax @class) : Variable(VariableKind.Class)
+public class ClassVariable(ClassDeclarationSyntax classDeclaration) : Variable(VariableKind.Class)
 {
     public override string GetCodeRepresentation()
     {
-        return @class.Identifier.ToString();
+        return classDeclaration.Identifier.ToString();
     }
 
-    public override bool MatchesCondition(ForeachConditionNode foreachCondition)
+    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
     {
         return foreachCondition.Type switch
         {
-            ForeachConditionNodeType.Partial => @class.Modifiers.Any(SyntaxKind.PartialKeyword),
-            ForeachConditionNodeType.AccessModifier => ((AccessModifierForEachConditionNode)foreachCondition).AccessModifier.IsApplicableFor(@class.Modifiers)
+            ForeachConditionNodeType.Partial => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword),
+            ForeachConditionNodeType.AccessModifier => ((AccessModifierForEachConditionNode)foreachCondition).AccessModifier.IsApplicableFor(
+                classDeclaration.Modifiers
+            )
         };
     }
 
@@ -36,7 +38,7 @@ public class ClassVariable(ClassDeclarationSyntax @class) : Variable(VariableKin
 
     private VariableCollection GetProperties()
     {
-        var properties = @class.Members
+        var properties = classDeclaration.Members
             .OfType<PropertyDeclarationSyntax>()
             .Select(property => new PropertyVariable(property))
             .ToList();
@@ -46,7 +48,7 @@ public class ClassVariable(ClassDeclarationSyntax @class) : Variable(VariableKin
 
     private BaseNamespaceDeclarationSyntax FindNamespace()
     {
-        var currentParent = @class.Parent;
+        var currentParent = classDeclaration.Parent;
 
         while (currentParent is not null)
         {

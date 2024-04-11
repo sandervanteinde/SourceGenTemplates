@@ -10,7 +10,7 @@ public class ValueVariable(object value) : Variable(VariableKind.Value)
         return value.ToString();
     }
 
-    public override bool MatchesCondition(ForeachConditionNode foreachCondition)
+    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
     {
         return false;
     }

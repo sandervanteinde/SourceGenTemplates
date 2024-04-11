@@ -4,6 +4,7 @@ using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.LogicalOperators;
 using SourceGenTemplates.Parsing.VariableExpressions;
 using SourceGenTemplates.Tokenization;
 
@@ -185,20 +186,42 @@ public class Parser(Tokenizer tokenizer)
 
     private ForeachConditionNode ParseForeachConditionNode()
     {
-        if (TryParseAccessModifier(out var accessModifier))
+        var left = GetNodeFromTokenizer();
+
+        if (tokenizer.ConsumeIfNextIsOfType(TokenType.Or, out var orToken))
         {
-            return new AccessModifierForEachConditionNode(accessModifier!);
+            var right = ParseForeachConditionNode();
+            var or = new OrLogicalOperator(left, right);
+            return new LogicalOperatorForeachConditionNode(or, orToken);
         }
 
-        ConsumeExpectedToken<PartialToken>("Invalid where expression");
-        return new PartialForEachConditionNode();
+        if (tokenizer.ConsumeIfNextIsOfType(TokenType.And, out var andToken))
+        {
+            var right = ParseForeachConditionNode();
+            var and = new AndLogicalOperator(left, right);
+            return new LogicalOperatorForeachConditionNode(and, andToken);
+        }
+
+        return left;
+
+        ForeachConditionNode GetNodeFromTokenizer()
+        {
+            if (TryParseAccessModifier(out var accessModifier, out var accessModifierToken))
+            {
+                return new AccessModifierForEachConditionNode(accessModifier!, accessModifierToken);
+            }
+
+            var partialToken = ConsumeExpectedToken<PartialToken>("Invalid where expression");
+            return new PartialForEachConditionNode(partialToken);
+        }
     }
 
-    private bool TryParseAccessModifier(out AccessModifierNode? node)
+    private bool TryParseAccessModifier(out AccessModifierNode? node, out Token token)
     {
         if (!tokenizer.TryPeek(out var currentNode))
         {
             node = null;
+            token = null!;
             return false;
         }
 
@@ -207,35 +230,36 @@ public class Parser(Tokenizer tokenizer)
         switch (tokenType)
         {
             case TokenType.Public:
-                return ConsumeAndReturn(AccessModifierType.Public, out node);
+                return ConsumeAndReturn(AccessModifierType.Public, out node, out token);
             case TokenType.Internal:
                 return !IsNextTokenType(TokenType.Protected)
-                    ? ConsumeAndReturn(AccessModifierType.Internal, out node)
-                    : ConsumeTwoAndReturn(AccessModifierType.ProtectedInternal, out node);
+                    ? ConsumeAndReturn(AccessModifierType.Internal, out node, out token)
+                    : ConsumeTwoAndReturn(AccessModifierType.ProtectedInternal, out node, out token);
             case TokenType.Protected when IsNextTokenType(TokenType.Internal):
-                return ConsumeTwoAndReturn(AccessModifierType.ProtectedInternal, out node);
+                return ConsumeTwoAndReturn(AccessModifierType.ProtectedInternal, out node, out token);
             case TokenType.Protected:
                 return IsNextTokenType(TokenType.Private)
-                    ? ConsumeTwoAndReturn(AccessModifierType.PrivateProtected, out node)
-                    : ConsumeAndReturn(AccessModifierType.Private, out node);
+                    ? ConsumeTwoAndReturn(AccessModifierType.PrivateProtected, out node, out token)
+                    : ConsumeAndReturn(AccessModifierType.Private, out node, out token);
             case TokenType.Private:
                 return IsNextTokenType(TokenType.Protected)
-                    ? ConsumeTwoAndReturn(AccessModifierType.PrivateProtected, out node)
-                    : ConsumeAndReturn(AccessModifierType.Private, out node);
+                    ? ConsumeTwoAndReturn(AccessModifierType.PrivateProtected, out node, out token)
+                    : ConsumeAndReturn(AccessModifierType.Private, out node, out token);
             default:
                 node = null!;
+                token = null!;
                 return false;
         }
 
-        bool ConsumeTwoAndReturn(AccessModifierType type, out AccessModifierNode nodeReturn)
+        bool ConsumeTwoAndReturn(AccessModifierType type, out AccessModifierNode nodeReturn, out Token token)
         {
             tokenizer.Consume();
-            return ConsumeAndReturn(type, out nodeReturn);
+            return ConsumeAndReturn(type, out nodeReturn, out token);
         }
 
-        bool ConsumeAndReturn(AccessModifierType type, out AccessModifierNode nodeReturn)
+        bool ConsumeAndReturn(AccessModifierType type, out AccessModifierNode nodeReturn, out Token token)
         {
-            tokenizer.Consume();
+            token = tokenizer.Consume();
             nodeReturn = new AccessModifierNode(type);
             return true;
         }

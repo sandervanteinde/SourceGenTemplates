@@ -11,7 +11,7 @@ public class NamespaceVariable(BaseNamespaceDeclarationSyntax @namespace) : Vari
         return @namespace.Name.ToFullString();
     }
 
-    public override bool MatchesCondition(ForeachConditionNode foreachCondition)
+    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
     {
         return false;
     }

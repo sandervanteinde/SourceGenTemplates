@@ -1,6 +1,8 @@
-﻿namespace SourceGenTemplates.Parsing.Foreach.Conditions;
+﻿using SourceGenTemplates.Tokenization;
 
-public abstract class ForeachConditionNode(ForeachConditionNodeType type)
+namespace SourceGenTemplates.Parsing.Foreach.Conditions;
+
+public abstract class ForeachConditionNode(Token token) : Node
 {
-    public ForeachConditionNodeType Type => type;
+    public Token Token => token;
 }

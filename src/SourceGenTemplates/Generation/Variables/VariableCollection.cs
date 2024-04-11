@@ -15,7 +15,7 @@ public class VariableCollection(IReadOnlyCollection<Variable> variables) : Varia
         throw new ParserException("Attempted to parse a collection to code which is not possible", new LinePositionSpan());
     }
 
-    public override bool MatchesCondition(ForeachConditionNode foreachCondition)
+    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
     {
         return variables.All(variable => variable.MatchesCondition(foreachCondition));
     }

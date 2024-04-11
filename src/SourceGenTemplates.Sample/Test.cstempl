@@ -12,7 +12,7 @@ partial class ::c::
     public static void SayHello()
     {
         ::foreach c.Properties
-            where internal
+            where internal or public or protected
             as p;
         Console.WriteLine("Property ::p::");
         ::end;

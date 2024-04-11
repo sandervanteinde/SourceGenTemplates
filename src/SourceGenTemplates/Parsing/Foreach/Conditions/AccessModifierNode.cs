@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Text;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace SourceGenTemplates.Parsing.Foreach.Conditions;
@@ -16,5 +17,13 @@ public class AccessModifierNode(AccessModifierType type) : Node
             AccessModifierType.ProtectedInternal => syntaxTokenList.Any(SyntaxKind.ProtectedKeyword) && syntaxTokenList.Any(SyntaxKind.InternalKeyword),
             AccessModifierType.PrivateProtected => syntaxTokenList.Any(SyntaxKind.PrivateKeyword) && syntaxTokenList.Any(SyntaxKind.ProtectedKeyword)
         };
+    }
+
+    protected internal override void AppendDebugString(StringBuilder sb)
+    {
+        sb.Append(
+            type.ToString()
+                .ToLower()
+        );
     }
 }

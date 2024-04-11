@@ -10,14 +10,14 @@ file = { block }.
 
 block =
       csharp 
-    | (context-switch, directive) 
-    | (context-switch, variable-expression, context-switch).
+    | (context_switch, directive) 
+    | (context_switch, variable_expression, context_switch).
 
 csharp = ? any valid C# which is not parsed by the grammer and interpreted as is ?
 
-directive = filename | for-i | foreach.
+directive = filename | for_i | foreach.
 
-filename = "filename", " ", expression, context-termination.
+filename = "filename", " ", expression, context_termination.
 
 expression = identifier | string | number.
 
@@ -25,32 +25,37 @@ string = """, { character } , """. (* A string with double quotes, e.g. "text" *
 
 number = digit, { digit }.
 
-for-i = "for", range, [ "as", identifier ], context-termination, 
+for_i = "for", range, [ "as", identifier ], context_termination, 
     block, { block },
-    context-switch, "end", context-termination.
+    context_switch, "end", context_termination.
 
-foreach = "foreach", foreach-target, 
-    [ "where", foreach-condition ],
+foreach = "foreach", foreach_target, 
+    [ "where", foreach_condition ],
     [ "as", identifier ],
-    context-termination, 
+    context_termination, 
     block, { block },
-    context-switch, "end", context-termination.
+    context_switch, "end", context_termination.
 
-foreach-target = "assembly" | variable-expression. (* variable-expression must be pointing to a valid collection *)
+foreach_target = "assembly" | variable_expression. (* variable_expression must be pointing to a valid collection *)
 
-foreach-condition = "partial" | access_modifier
+foreach_condition = "partial" | access_modifier | logical_operator.
+
+logical_operator = or_operator | and_operator.
+
+or_operator = foreach_condition, "or", foreach_condition.
+and_operator = foreach_condition, "and", foreach_condition.
 
 range = number, "..", number.
 
 identifier = letter, { letter | number }.
 
-variable-expression = identifier
-    | (identifier, property-access).
+variable_expression = identifier
+    | (identifier, property_access).
 
-property-access = ".", identifier, [ property-access ]
+property_access = ".", identifier, [ property_access ]
 
-context-switch = "::".
+context_switch = "::".
 
 access_modifier: "public" | "private" | "protected" | "internal" | ("protected", "internal") | ("private", "protected")
 
-context-termination = ";".
+context_termination = ";".

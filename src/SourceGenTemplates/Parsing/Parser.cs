@@ -181,8 +181,43 @@ public class Parser(Tokenizer tokenizer)
             return true;
         }
 
+        if (token is IfToken)
+        {
+            tokenizer.Consume(2);
+            var booleanExpressionNode = ParseBooleanExpressionNode();
+            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected if statement to be terminated with a ;");
+            var blocks = ParseBlocks();
+            _ = ConsumeExpectedToken<CodeContextToken>("Expected ::end");
+            _ = ConsumeExpectedToken<EndToken>("Expected ::end");
+            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
+            var ifNode = new IfNode(booleanExpressionNode, blocks);
+            directiveNode = new IfDirectiveNode(ifNode);
+            return true;
+        }
+
         directiveNode = null!;
         return false;
+    }
+
+    private BooleanExpressionNode ParseBooleanExpressionNode()
+    {
+        if (TryParseVariableExpression(out var variableExpression))
+        {
+            ConsumeExpectedToken<IsToken>("Expected variable expression to be followed with 'is'");
+            var foreachCondition = ParseForeachConditionNode();
+            return new BooleanExpressionNode(variableExpression!, foreachCondition);
+        }
+
+        var foreachConditionFirst = ParseForeachConditionNode();
+        ConsumeExpectedToken<IsToken>("Expected condition to be followed with 'is'");
+
+        if (!TryParseVariableExpression(out variableExpression))
+        {
+            tokenizer.TryPeek(out var currentToken);
+            throw new ParserException("A boolean expression must consist out of a variable and condition", currentToken!);
+        }
+
+        return new BooleanExpressionNode(variableExpression!, foreachConditionFirst);
     }
 
     private ForeachConditionNode ParseForeachConditionNode()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -58,8 +59,26 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         {
             DirectiveNodeType.Filename => GenerateFileNameDirectiveNode(((FileNameDirectiveNode)directive).FileName),
             DirectiveNodeType.ForI => GenerateForIDirectiveNode(((ForIDirectiveNode)directive).ForINode),
-            DirectiveNodeType.Foreach => GenerateForeachDirectiveNode(((ForeachDirectiveNode)directive).ForeachNode)
+            DirectiveNodeType.Foreach => GenerateForeachDirectiveNode(((ForeachDirectiveNode)directive).ForeachNode),
+            DirectiveNodeType.If => GenerateIfDirectiveNode(((IfDirectiveNode)directive).If),
+            _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    private bool GenerateIfDirectiveNode(IfNode @if)
+    {
+        if (IsBooleanExpressionTrue(@if.BooleanExpression))
+        {
+            GenerateBlocks(@if.Blocks);
+        }
+
+        return true;
+    }
+
+    private bool IsBooleanExpressionTrue(BooleanExpressionNode booleanExpressionNode)
+    {
+        var variable = _variables.GetOrThrow(booleanExpressionNode.VariableExpression);
+        return variable.MatchesCondition(booleanExpressionNode.ForeachCondition);
     }
 
     private bool GenerateFileNameDirectiveNode(FileNameNode node)

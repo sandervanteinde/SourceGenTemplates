@@ -12,3 +12,13 @@ public class ForeachDirectiveNode(ForeachNode foreachNode) : DirectiveNode(Direc
         foreachNode.AppendDebugString(sb);
     }
 }
+
+public class IfDirectiveNode(IfNode @if) : DirectiveNode(DirectiveNodeType.If)
+{
+    public IfNode If => @if;
+
+    protected internal override void AppendDebugString(StringBuilder sb)
+    {
+        @if.AppendDebugString(sb);
+    }
+}

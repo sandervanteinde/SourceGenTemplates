@@ -12,9 +12,17 @@ partial class ::c::
     public static void SayHello()
     {
         ::foreach c.Properties
-            where private or protected and public
             as p;
-        Console.WriteLine("Property ::p::");
+
+            ::if p is public;
+                Console.WriteLine("Public property ::p::");
+            ::end;
+            ::if p is protected;
+                Console.WriteLine("Protected property ::p::");
+            ::end;
+            ::if p is internal;
+                Console.WriteLine("Internal property ::p::");
+            ::end;
         ::end;
     }
 }

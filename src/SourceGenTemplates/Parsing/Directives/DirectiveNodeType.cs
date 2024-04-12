@@ -4,5 +4,6 @@ public enum DirectiveNodeType
 {
     ForI,
     Filename,
-    Foreach
+    Foreach,
+    If
 }

@@ -214,6 +214,8 @@ public class Tokenizer(string sourceText)
                 "and" => new AndToken(namePosition),
                 "or" => new OrToken(namePosition),
                 "not" => new NotToken(namePosition),
+                "if" => new IfToken(namePosition),
+                "is" => new IsToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }

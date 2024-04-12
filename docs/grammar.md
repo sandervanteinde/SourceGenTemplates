@@ -15,7 +15,7 @@ block =
 
 csharp = ? any valid C# which is not parsed by the grammer and interpreted as is ?
 
-directive = filename | for_i | foreach.
+directive = filename | for_i | foreach | if_statement.
 
 filename = "filename", " ", expression, context_termination.
 
@@ -35,6 +35,12 @@ foreach = "foreach", foreach_target,
     context_termination, 
     block, { block },
     context_switch, "end", context_termination.
+    
+if_statement = "if", boolean_expression, context_termination,
+    { block },
+    context_switch, "end", context_termination.
+    
+boolean_expression = (variable_expression, "is", foreach_condition) | (foreach_condition, "is", variable_expression).
 
 foreach_target = "assembly" | variable_expression. (* variable_expression must be pointing to a valid collection *)
 
@@ -57,6 +63,6 @@ property_access = ".", identifier, [ property_access ]
 
 context_switch = "::".
 
-access_modifier: "public" | "private" | "protected" | "internal" | ("protected", "internal") | ("private", "protected")
+access_modifier: "public" | "private" | "protected" | "internal" | ("protected", "internal") | ("internal", "protected"), ("private", "protected") | ("protected", "private")
 
 context_termination = ";".

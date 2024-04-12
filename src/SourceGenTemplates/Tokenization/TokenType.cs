@@ -24,5 +24,7 @@ public enum TokenType
     Internal,
     Or,
     And,
-    Not
+    Not,
+    Is,
+    If
 }

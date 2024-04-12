@@ -1,0 +1,25 @@
+{
+  "name": "sourcegen-templates-lang",
+  "displayName": "sourcegen-templates-lang",
+  "description": "Adds supports for C# Source generation templates",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "cstempl",
+      "aliases": ["C# Source Generator Template", "cstempl"],
+      "extensions": [".cstempl"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "cstempl",
+      "scopeName": "source.cs.sourcegentemplates",
+      "path": "./syntaxes/cstempl.tmLanguage.json"
+    }]
+  }
+}

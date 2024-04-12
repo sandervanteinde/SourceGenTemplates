@@ -1,0 +1,60 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "C# Source Generator Template",
+	"fileTypes": [
+		".cstempl"
+	],
+	"patterns": [
+		{
+			"include": "#multi-line-statement"
+		},
+		{
+			"include": "#csharp-overrides"
+		},
+		{
+			"include": "source.cs"
+		}
+	],
+	"foldingStartMarker": "::",
+	"foldingStopMarker": ";",
+	"repository": {
+		"csharp-overrides": {
+			"patterns": [
+				{
+					"include": "source.cs.namespace-declaration"
+				},
+				{
+					"include": "#multi-line-statement"
+				}
+			]
+		},
+		"multi-line-statement": {
+			"begin": "(::)",
+			"end": "(;|::)",
+			"contentName": "source.cs",
+			"beginCaptures": {
+				"1": {
+					"name": "meta.context-switch"
+				}
+			},
+			"patterns": [
+				{
+					"include": "#template-context"
+				}
+			]
+		},
+		"template-context": {
+			"patterns": [
+				{
+					"name": "keyword.control",
+					"match": "(foreach|where|as|and|or|end|filename)"
+				},
+				{
+					"name": "entity.name.function",
+					"match": "(class|partial|private|proptected|public)"
+				}
+			]
+		}
+	},
+	"scopeName": "source.cs.sourcegentemplates"
+}

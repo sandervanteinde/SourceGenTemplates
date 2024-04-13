@@ -1,5 +1,4 @@
-﻿::foreach class
-    as c
+﻿::foreach var c in  class
     where c is partial;
 
 ::filename c;
@@ -11,13 +10,10 @@ partial class ::c::
 {
     public static void SayHello()
     {
-        ::foreach c.Properties
-            as p;
+        ::foreach var p in c.Properties;
 
-            ::if p is public;
-                Console.WriteLine("Public property ::p::");
-            ::else if p is protected;
-                Console.WriteLine("Protected property ::p::");
+            ::if p is public or p is protected;
+                Console.WriteLine("Public or protected property ::p::");
             ::else if p is internal;
                 Console.WriteLine("Internal property ::p::");
             ::else;

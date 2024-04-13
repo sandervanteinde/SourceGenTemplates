@@ -71,7 +71,7 @@ public class Parser(Tokenizer tokenizer)
 
     private bool TryParseVariableExpression(out VariableExpressionNode? variableExpressionNode)
     {
-        if (!tokenizer.TryPeek(out var identifierTokenTypeCheck) || identifierTokenTypeCheck!.TokenType != TokenType.Identifier)
+        if (!tokenizer.TryPeek(out var identifierTokenTypeCheck) || identifierTokenTypeCheck!.Type != TokenType.Identifier)
         {
             variableExpressionNode = null;
             return false;
@@ -133,14 +133,10 @@ public class Parser(Tokenizer tokenizer)
         if (token is ForToken)
         {
             tokenizer.Consume(2);
+            _ = ConsumeExpectedToken<VarToken>("Expected 'var' to be followed by 'for'");
+            var identifier = ParseIdentifierNode();
+            _ = ConsumeExpectedToken<InToken>("Expected 'in' to be followed by identifier in 'for' statement");
             var rangeToken = ParseRangeNode();
-            IdentifierNode? identifier = null;
-
-            if (tokenizer.ConsumeIfNextIsOfType(TokenType.As))
-            {
-                identifier = ParseIdentifierNode();
-            }
-
             ConsumeExpectedToken<CodeContextEndToken>("Expected for statement to end with ;");
 
             var blocks = ParseBlocks();
@@ -155,20 +151,13 @@ public class Parser(Tokenizer tokenizer)
         if (token is ForeachToken)
         {
             tokenizer.Consume(2);
+            ConsumeExpectedToken<VarToken>("Expected 'var' to be followed by 'foreach'");
+            var identifierNode = ParseIdentifierNode();
+            ConsumeExpectedToken<InToken>("Expected 'in' to be followed by an identifier in a 'foreach'");
             var foreachTarget = ParseForeachTarget();
-            IdentifierNode? identifierNode = null;
-            BooleanExpressionNode? conditionNode = null;
-
-            if (tokenizer.ConsumeIfNextIsOfType(TokenType.As))
-            {
-                var identifier = ConsumeExpectedToken<IdentifierToken>("Expected identifier after 'as'");
-                identifierNode = new IdentifierNode(identifier);
-
-                if (tokenizer.ConsumeIfNextIsOfType(TokenType.Where))
-                {
-                    conditionNode = ParseBooleanExpressionNode();
-                }
-            }
+            var conditionNode = tokenizer.ConsumeIfNextIsOfType(TokenType.Where)
+                ? ParseBooleanExpressionNode()
+                : null;
 
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
 
@@ -202,8 +191,8 @@ public class Parser(Tokenizer tokenizer)
 
     private ElseExpressionNode? TryParseElseExpressionNode()
     {
-        if (!tokenizer.TryPeek(out var possibleCodeContextSwitch) || possibleCodeContextSwitch!.TokenType != TokenType.CodeContextSwitch
-            || !tokenizer.TryPeek(1, out var afterCodeContext) || afterCodeContext!.TokenType is not TokenType.Else)
+        if (!tokenizer.TryPeek(out var possibleCodeContextSwitch) || possibleCodeContextSwitch!.Type != TokenType.CodeContextSwitch
+            || !tokenizer.TryPeek(1, out var afterCodeContext) || afterCodeContext!.Type is not TokenType.Else)
         {
             return null;
         }
@@ -232,24 +221,24 @@ public class Parser(Tokenizer tokenizer)
 
     private BooleanExpressionNode ParseBooleanExpressionNode(BooleanExpressionNode left, int precedence)
     {
-        while (tokenizer.TryPeek(out var lookahead) && lookahead!.TokenType is TokenType.Or or TokenType.And
-               && GetPrecedenceForTokenType(lookahead.TokenType) >= precedence)
+        while (tokenizer.TryPeek(out var lookahead) && lookahead!.Type is TokenType.Or or TokenType.And
+               && GetPrecedenceForTokenType(lookahead.Type) >= precedence)
         {
             var op = tokenizer.Consume();
             var right = GetRawNodeFromTokenizer();
 
-            while (tokenizer.TryPeek(out lookahead) && lookahead!.TokenType is TokenType.Or or TokenType.And
-                   && GetPrecedenceForTokenType(lookahead.TokenType) > GetPrecedenceForTokenType(op.TokenType))
+            while (tokenizer.TryPeek(out lookahead) && lookahead!.Type is TokenType.Or or TokenType.And
+                   && GetPrecedenceForTokenType(lookahead.Type) > GetPrecedenceForTokenType(op.Type))
             {
                 right = ParseBooleanExpressionNode(
-                    right, +(GetPrecedenceForTokenType(lookahead.TokenType) > GetPrecedenceForTokenType(op.TokenType)
+                    right, +(GetPrecedenceForTokenType(lookahead.Type) > GetPrecedenceForTokenType(op.Type)
                         ? 1
                         : 0)
                 );
             }
 
             left = new BooleanOperatorBooleanExpressionNode(
-                op.TokenType switch
+                op.Type switch
                 {
                     TokenType.Or => new OrLogicalOperator(left, right),
                     TokenType.And => new AndLogicalOperator(left, right),
@@ -322,7 +311,7 @@ public class Parser(Tokenizer tokenizer)
             return false;
         }
 
-        var tokenType = currentNode!.TokenType;
+        var tokenType = currentNode!.Type;
 
         return tokenType switch
         {
@@ -359,19 +348,19 @@ public class Parser(Tokenizer tokenizer)
 
         bool IsNextTokenType(TokenType expectedTokenType)
         {
-            return tokenizer.TryPeek(1, out var next) && next!.TokenType == expectedTokenType;
+            return tokenizer.TryPeek(1, out var next) && next!.Type == expectedTokenType;
         }
     }
 
     private ExpressionNode ParseExpression()
     {
         var token = tokenizer.Consume();
-        return token.TokenType switch
+        return token.Type switch
         {
             TokenType.String => new StringExpressionNode((StringToken)token),
             TokenType.Number => new NumberExpressionNode((NumberToken)token),
             TokenType.Identifier => new IdentifierExpressionNode((IdentifierToken)token),
-            _ => throw new ParserException($"Token {token.TokenType} is not eligible for expressions", token)
+            _ => throw new ParserException($"Token {token.Type} is not eligible for expressions", token)
         };
     }
 

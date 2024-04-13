@@ -9,7 +9,7 @@ public enum TokenType
     End,
     Number,
     DoubleDot,
-    As,
+    In,
     CodeContextSwitch,
     CodeContextEnd,
     Class,
@@ -27,5 +27,6 @@ public enum TokenType
     Not,
     Is,
     If,
-    Else
+    Else,
+    Var
 }

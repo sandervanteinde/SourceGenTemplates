@@ -25,12 +25,12 @@ string = """, { character } , """. (* A string with double quotes, e.g. "text" *
 
 number = digit, { digit }.
 
-for_i = "for", range, [ "as", identifier ], context_termination, 
+for_i = "for", "var", identifier, "in", range, context_termination, 
     block, { block },
     context_switch, "end", context_termination.
 
-foreach = "foreach", foreach_target, 
-    [ "as", identifier [ "where", boolean_expression ] ],
+foreach = "foreach", "var", identifier, "in", foreach_target, 
+    [ "where", boolean_expression ],
     context_termination, 
     block, { block },
     context_switch, "end", context_termination.

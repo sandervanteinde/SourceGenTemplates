@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;
@@ -176,6 +177,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         foreach (var iteratorVariable in variableCollection.Variables)
         {
             using var variableContext = _variables.AddVariableToContext(identifier?.Identifier, iteratorVariable);
+
             if (node.Condition is null || IsBooleanExpressionTrue(node.Condition))
             {
                 GenerateBlocks(node.Blocks);
@@ -201,9 +203,31 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private void OutputCurrentContentsToFile()
     {
-        if (_sb.Length > 0)
+        if (_sb.Length <= 0)
         {
-            context.AddSource($"{fileName}.g.cs", _sb.ToString());
+            return;
+        }
+
+        var currentFileName = fileName;
+        var fileContents = SourceText.From(_sb.ToString(), Encoding.UTF8);
+        var attempt = 0;
+
+        while (true)
+        {
+            try
+            {
+                context.AddSource($"{currentFileName}.g.cs", fileContents);
+                break;
+            }
+            catch (ArgumentException)
+            {
+                if (attempt++ >= 100)
+                {
+                    throw;
+                }
+
+                currentFileName = $"{currentFileName}.{attempt}";
+            }
         }
 
         _sb.Clear();

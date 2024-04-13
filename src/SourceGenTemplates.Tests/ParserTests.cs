@@ -13,9 +13,8 @@ public class ParserTests
     {
         // ARRANGE
         var code = """
-                   ::foreach class
-                       where partial
-                       as c;
+                   ::foreach var c in class
+                       where c is partial;
                    ::end;
                    """;
         var tokenizer = new Tokenizer(code);

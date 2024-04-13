@@ -20,7 +20,7 @@ public class Tokenizer(string sourceText)
 
     public bool ConsumeIfNextIsOfType(TokenType type)
     {
-        if (TryPeek(out var token) && token!.TokenType == type)
+        if (TryPeek(out var token) && token!.Type == type)
         {
             Consume();
             return true;
@@ -197,7 +197,8 @@ public class Tokenizer(string sourceText)
                 "filename" => new FileNameToken(namePosition),
                 "for" => new ForToken(namePosition),
                 "end" => new EndToken(namePosition),
-                "as" => new AsToken(namePosition),
+                "var" => new VarToken(namePosition),
+                "in" => new InToken(namePosition),
                 "foreach" => new ForeachToken(namePosition),
                 "class" => new ClassToken(namePosition),
                 "where" => new WhereToken(namePosition),

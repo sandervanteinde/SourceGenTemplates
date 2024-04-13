@@ -10,6 +10,8 @@
     <ItemGroup>
         <None Remove="Test.cstempl"/>
         <AdditionalFiles Include="Test.cstempl"/>
+        <None Remove="GenerateBuilders.cstempl"/>
+        <AdditionalFiles Include="GenerateBuilders.cstempl"/>
     </ItemGroup>
 
     <ItemGroup>

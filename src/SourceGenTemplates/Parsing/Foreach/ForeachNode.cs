@@ -8,7 +8,7 @@ namespace SourceGenTemplates.Parsing.Foreach;
 
 public class ForeachNode(
     ForeachTarget target,
-    IdentifierNode? identifier,
+    IdentifierNode identifier,
     IReadOnlyCollection<BlockNode> blocks,
     BooleanExpressionNode? condition) : Node
 {
@@ -19,14 +19,10 @@ public class ForeachNode(
 
     protected internal override void AppendDebugString(StringBuilder sb)
     {
-        sb.Append("foreach ");
+        sb.Append("foreach var ");
+        identifier.AppendDebugString(sb);
+        sb.Append(" in ");
         target.AppendDebugString(sb);
-
-        if (identifier is not null)
-        {
-            sb.Append(" as ");
-            identifier.AppendDebugString(sb);
-        }
 
         if (condition is not null)
         {

@@ -10,9 +10,8 @@ public class TokenizerTests
     {
         // ARRANGE
         var code = """
-                   ::foreach class
-                       where partial
-                       as c;
+                   ::foreach var c in class
+                       where partial;
                    """;
 
         // ACT
@@ -24,14 +23,15 @@ public class TokenizerTests
             .SatisfyRespectively(
                 TokenType<CodeContextToken>(),
                 TokenType<ForeachToken>(),
-                TokenType<ClassToken>(),
-                TokenType<WhereToken>(),
-                TokenType<PartialToken>(),
-                TokenType<AsToken>(),
+                TokenType<VarToken>(),
                 TokenType<IdentifierToken>(
                     c => c.Identifier.Should()
                         .Be("c")
                 ),
+                TokenType<InToken>(),
+                TokenType<ClassToken>(),
+                TokenType<WhereToken>(),
+                TokenType<PartialToken>(),
                 TokenType<CodeContextEndToken>()
             );
     }

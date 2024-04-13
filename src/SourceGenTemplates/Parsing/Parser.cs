@@ -157,18 +157,17 @@ public class Parser(Tokenizer tokenizer)
             tokenizer.Consume(2);
             var foreachTarget = ParseForeachTarget();
             IdentifierNode? identifierNode = null;
-
-            ForeachConditionNode? conditionNode = null;
-
-            if (tokenizer.ConsumeIfNextIsOfType(TokenType.Where))
-            {
-                conditionNode = ParseForeachConditionNode();
-            }
+            BooleanExpressionNode? conditionNode = null;
 
             if (tokenizer.ConsumeIfNextIsOfType(TokenType.As))
             {
                 var identifier = ConsumeExpectedToken<IdentifierToken>("Expected identifier after 'as'");
                 identifierNode = new IdentifierNode(identifier);
+
+                if (tokenizer.ConsumeIfNextIsOfType(TokenType.Where))
+                {
+                    conditionNode = ParseBooleanExpressionNode();
+                }
             }
 
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
@@ -228,31 +227,10 @@ public class Parser(Tokenizer tokenizer)
 
     private BooleanExpressionNode ParseBooleanExpressionNode()
     {
-        if (TryParseVariableExpression(out var variableExpression))
-        {
-            ConsumeExpectedToken<IsToken>("Expected variable expression to be followed with 'is'");
-            var foreachCondition = ParseForeachConditionNode();
-            return new BooleanExpressionNode(variableExpression!, foreachCondition);
-        }
-
-        var foreachConditionFirst = ParseForeachConditionNode();
-        ConsumeExpectedToken<IsToken>("Expected condition to be followed with 'is'");
-
-        if (!TryParseVariableExpression(out variableExpression))
-        {
-            tokenizer.TryPeek(out var currentToken);
-            throw new ParserException("A boolean expression must consist out of a variable and condition", currentToken!);
-        }
-
-        return new BooleanExpressionNode(variableExpression!, foreachConditionFirst);
+        return ParseBooleanExpressionNode(GetRawNodeFromTokenizer(), 0);
     }
 
-    private ForeachConditionNode ParseForeachConditionNode()
-    {
-        return ParseForeachConditionNode(GetRawNodeFromTokenizer(), 0);
-    }
-
-    private ForeachConditionNode ParseForeachConditionNode(ForeachConditionNode left, int precedence)
+    private BooleanExpressionNode ParseBooleanExpressionNode(BooleanExpressionNode left, int precedence)
     {
         while (tokenizer.TryPeek(out var lookahead) && lookahead!.TokenType is TokenType.Or or TokenType.And
                && GetPrecedenceForTokenType(lookahead.TokenType) >= precedence)
@@ -260,23 +238,23 @@ public class Parser(Tokenizer tokenizer)
             var op = tokenizer.Consume();
             var right = GetRawNodeFromTokenizer();
 
-            while (tokenizer.TryPeek(out lookahead) && lookahead.TokenType is TokenType.Or or TokenType.And
+            while (tokenizer.TryPeek(out lookahead) && lookahead!.TokenType is TokenType.Or or TokenType.And
                    && GetPrecedenceForTokenType(lookahead.TokenType) > GetPrecedenceForTokenType(op.TokenType))
             {
-                right = ParseForeachConditionNode(
+                right = ParseBooleanExpressionNode(
                     right, +(GetPrecedenceForTokenType(lookahead.TokenType) > GetPrecedenceForTokenType(op.TokenType)
                         ? 1
                         : 0)
                 );
             }
 
-            left = new LogicalOperatorForeachConditionNode(
+            left = new BooleanOperatorBooleanExpressionNode(
                 op.TokenType switch
                 {
                     TokenType.Or => new OrLogicalOperator(left, right),
                     TokenType.And => new AndLogicalOperator(left, right),
                     _ => throw new InvalidOperationException("The while only allows or/and")
-                }, op
+                }
             );
         }
 
@@ -293,21 +271,46 @@ public class Parser(Tokenizer tokenizer)
         }
     }
 
-    private ForeachConditionNode GetRawNodeFromTokenizer()
+    private BooleanExpressionNode GetRawNodeFromTokenizer()
     {
-        if (tokenizer.ConsumeIfNextIsOfType(TokenType.Not, out var notToken))
+        if (tokenizer.ConsumeIfNextIsOfType(TokenType.Not))
         {
             var logicalOperator = new NotLogicalOperator(GetRawNodeFromTokenizer());
-            return new LogicalOperatorForeachConditionNode(logicalOperator, notToken);
+            return new BooleanOperatorBooleanExpressionNode(logicalOperator);
         }
+
+        var statementStartsWithVariableExpression = TryParseVariableExpression(out var variableExpressionNode);
+
+        if (statementStartsWithVariableExpression)
+        {
+            _ = ConsumeExpectedToken<IsToken>("Expected 'is'");
+        }
+
+        PredefinedConditionNode predefinedConditionNode;
 
         if (TryParseAccessModifier(out var accessModifier, out var accessModifierToken))
         {
-            return new AccessModifierForEachConditionNode(accessModifier!, accessModifierToken);
+            predefinedConditionNode = new AccessModifierPredefinedConditionNode(accessModifier!, accessModifierToken);
+        }
+        else
+        {
+            var partialToken = ConsumeExpectedToken<PartialToken>("Invalid boolean expression");
+            predefinedConditionNode = new PartialPredefinedConditionNode(partialToken);
         }
 
-        var partialToken = ConsumeExpectedToken<PartialToken>("Invalid where expression");
-        return new PartialForEachConditionNode(partialToken);
+        if (!statementStartsWithVariableExpression)
+        {
+            _ = ConsumeExpectedToken<IsToken>("Expected 'is'");
+            TryParseVariableExpression(out variableExpressionNode);
+
+            if (variableExpressionNode is null)
+            {
+                tokenizer.TryPeek(out var next);
+                throw new ParserException("Expected variable expression", next!);
+            }
+        }
+
+        return new SimpleComparisonBooleanExpressionNode(variableExpressionNode!, predefinedConditionNode);
     }
 
     private bool TryParseAccessModifier(out AccessModifierNode? node, out Token token)

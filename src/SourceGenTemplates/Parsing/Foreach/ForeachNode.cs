@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 using SourceGenTemplates.Parsing.BlockNodes;
-using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.ControlDirectives;
 
 namespace SourceGenTemplates.Parsing.Foreach;
 
@@ -10,12 +10,12 @@ public class ForeachNode(
     ForeachTarget target,
     IdentifierNode? identifier,
     IReadOnlyCollection<BlockNode> blocks,
-    ForeachConditionNode? condition) : Node
+    BooleanExpressionNode? condition) : Node
 {
     public ForeachTarget ForeachTarget => target;
     public IdentifierNode? Identifier => identifier;
     public IReadOnlyCollection<BlockNode> Blocks => blocks;
-    public ForeachConditionNode? Condition => condition;
+    public BooleanExpressionNode? Condition => condition;
 
     protected internal override void AppendDebugString(StringBuilder sb)
     {

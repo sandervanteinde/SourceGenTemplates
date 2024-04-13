@@ -20,12 +20,7 @@ public class Tokenizer(string sourceText)
 
     public bool ConsumeIfNextIsOfType(TokenType type)
     {
-        return ConsumeIfNextIsOfType(type, out _);
-    }
-
-    public bool ConsumeIfNextIsOfType(TokenType type, out Token token)
-    {
-        if (TryPeek(out token) && token!.TokenType == type)
+        if (TryPeek(out var token) && token!.TokenType == type)
         {
             Consume();
             return true;

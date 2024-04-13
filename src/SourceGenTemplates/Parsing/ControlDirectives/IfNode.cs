@@ -14,12 +14,14 @@ public class IfNode(BooleanExpressionNode booleanExpressionNode, IReadOnlyCollec
     {
         sb.Append("if ");
         booleanExpressionNode.AppendDebugString(sb);
-        sb.Append(" end;");
+        sb.Append(";");
 
         foreach (var block in blocks)
         {
             block.AppendDebugString(sb);
         }
+        
+        elseExpressionNode?.AppendDebugString(sb);
 
         sb.Append(" end;");
     }

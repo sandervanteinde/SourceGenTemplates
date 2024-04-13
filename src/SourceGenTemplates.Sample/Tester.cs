@@ -7,3 +7,13 @@ public partial class Tester
     protected string LastName { get; set; }
     private string Test { get; set; }
 }
+
+public class Test
+{
+    
+}
+
+public partial class Tester2
+{
+    public int String { get; set; }
+}

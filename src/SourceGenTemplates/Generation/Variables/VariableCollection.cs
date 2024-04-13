@@ -15,18 +15,9 @@ public class VariableCollection(IReadOnlyCollection<Variable> variables) : Varia
         throw new ParserException("Attempted to parse a collection to code which is not possible", new LinePositionSpan());
     }
 
-    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
+    protected override bool MatchCondition(PredefinedConditionNode predefinedCondition)
     {
-        return variables.All(variable => variable.MatchesCondition(foreachCondition));
-    }
-
-    public VariableCollection ApplyFilter(ForeachConditionNode condition)
-    {
-        var newVariables = variables
-            .Where(variable => variable.MatchesCondition(condition))
-            .ToList();
-
-        return new VariableCollection(newVariables);
+        return variables.All(variable => variable.MatchesCondition(predefinedCondition));
     }
 
     protected override Variable? TryAccessProperty(IdentifierToken identifier)

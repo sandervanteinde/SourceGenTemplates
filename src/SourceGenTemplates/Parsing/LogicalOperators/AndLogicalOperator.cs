@@ -1,13 +1,13 @@
 ﻿using System.Text;
-using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.ControlDirectives;
 
 namespace SourceGenTemplates.Parsing.LogicalOperators;
 
-public class AndLogicalOperator(ForeachConditionNode left, ForeachConditionNode right)
+public class AndLogicalOperator(BooleanExpressionNode left, BooleanExpressionNode right)
     : LogicalOperator(LogicalOperatorType.And)
 {
-    public ForeachConditionNode Left => left;
-    public ForeachConditionNode Right => right;
+    public BooleanExpressionNode Left => left;
+    public BooleanExpressionNode Right => right;
 
     public override int Precedence => 2;
 

@@ -30,8 +30,7 @@ for_i = "for", range, [ "as", identifier ], context_termination,
     context_switch, "end", context_termination.
 
 foreach = "foreach", foreach_target, 
-    [ "where", foreach_condition ],
-    [ "as", identifier ],
+    [ "as", identifier [ "where", boolean_expression ] ],
     context_termination, 
     block, { block },
     context_switch, "end", context_termination.
@@ -45,17 +44,19 @@ else_statement =
     ( "else", context_termination, { block } )
     | ( "else", "if", boolean_expression, context_termination, { block }, [ else_statement ] ).
 
-boolean_expression = (variable_expression, "is", foreach_condition) | (foreach_condition, "is", variable_expression).
+boolean_expression = (variable_expression, "is", predefined_conditions)
+    | (predefined_conditions, "is", variable_expression) 
+    | logical_operator.
 
-foreach_target = "assembly" | variable_expression. (* variable_expression must be pointing to a valid collection *)
+foreach_target = "class" | variable_expression. (* variable_expression must be pointing to a valid collection *)
 
-foreach_condition = "partial" | access_modifier | logical_operator.
+predefined_conditions = "partial" | access_modifier
 
 logical_operator = or_operator | and_operator | not_operator.
 
-or_operator = foreach_condition, "or", foreach_condition.
-and_operator = foreach_condition, "and", foreach_condition.
-not_operator = "not", foreach_condition.
+or_operator = boolean_expression, "or", boolean_expression.
+and_operator = boolean_expression, "and", boolean_expression.
+not_operator = "not", boolean_expression.
 
 range = number, "..", number.
 

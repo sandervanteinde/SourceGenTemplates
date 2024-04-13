@@ -1,11 +1,11 @@
 ﻿using System.Text;
-using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.ControlDirectives;
 
 namespace SourceGenTemplates.Parsing.LogicalOperators;
 
-public class NotLogicalOperator(ForeachConditionNode condition) : LogicalOperator(LogicalOperatorType.Not)
+public class NotLogicalOperator(BooleanExpressionNode condition) : LogicalOperator(LogicalOperatorType.Not)
 {
-    public ForeachConditionNode Condition => condition;
+    public BooleanExpressionNode Condition => condition;
 
     public override int Precedence => 3;
 

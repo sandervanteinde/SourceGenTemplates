@@ -9,6 +9,7 @@ using SourceGenTemplates.Parsing.ControlDirectives;
 using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
+using SourceGenTemplates.Parsing.LogicalOperators;
 
 namespace SourceGenTemplates.Generation;
 
@@ -84,11 +85,12 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
                 ElseNodeType.ElseIf => ParseElseIf((ElseIfElseExpressionNode)elseExpression)
             };
         }
+
         return true;
 
-        ElseExpressionNode? ParseElse(ElseElseExpressionNode elseExpression)
+        ElseExpressionNode? ParseElse(ElseElseExpressionNode elseElseExpression)
         {
-            GenerateBlocks(elseExpression.Blocks);
+            GenerateBlocks(elseElseExpression.Blocks);
             return null;
         }
 
@@ -106,8 +108,43 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool IsBooleanExpressionTrue(BooleanExpressionNode booleanExpressionNode)
     {
-        var variable = _variables.GetOrThrow(booleanExpressionNode.VariableExpression);
-        return variable.MatchesCondition(booleanExpressionNode.ForeachCondition);
+        return booleanExpressionNode.ExpressionType switch
+        {
+            BooleanExpressionType.Simple => IsSimpleBooleanExpressionTrue((SimpleComparisonBooleanExpressionNode)booleanExpressionNode),
+            BooleanExpressionType.BooleanOperator => IsBooleanOperatorExpressionTrue((BooleanOperatorBooleanExpressionNode)booleanExpressionNode)
+        };
+    }
+
+    private bool IsBooleanOperatorExpressionTrue(BooleanOperatorBooleanExpressionNode booleanOperatorBooleanExpressionNode)
+    {
+        var logicalOperator = booleanOperatorBooleanExpressionNode.LogicalOperator;
+        return logicalOperator.Type switch
+        {
+            LogicalOperatorType.Or => IsOrOperatorTrue((OrLogicalOperator)logicalOperator),
+            LogicalOperatorType.And => IsAndOperatorTrue((AndLogicalOperator)logicalOperator),
+            LogicalOperatorType.Not => IsNotOperatorTrue((NotLogicalOperator)logicalOperator)
+        };
+
+        bool IsOrOperatorTrue(OrLogicalOperator or)
+        {
+            return IsBooleanExpressionTrue(or.Left) || IsBooleanExpressionTrue(or.Right);
+        }
+
+        bool IsAndOperatorTrue(AndLogicalOperator and)
+        {
+            return IsBooleanExpressionTrue(and.Left) && IsBooleanExpressionTrue(and.Right);
+        }
+
+        bool IsNotOperatorTrue(NotLogicalOperator not)
+        {
+            return !IsBooleanExpressionTrue(not.Condition);
+        }
+    }
+
+    private bool IsSimpleBooleanExpressionTrue(SimpleComparisonBooleanExpressionNode simpleComparisonBooleanExpressionNode)
+    {
+        var variable = _variables.GetOrThrow(simpleComparisonBooleanExpressionNode.VariableExpression);
+        return variable.MatchesCondition(simpleComparisonBooleanExpressionNode.PredefinedCondition);
     }
 
     private bool GenerateFileNameDirectiveNode(FileNameNode node)
@@ -136,15 +173,13 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
         var variableCollection = (VariableCollection)variable;
 
-        if (node.Condition is not null)
-        {
-            variableCollection = variableCollection.ApplyFilter(node.Condition);
-        }
-
         foreach (var iteratorVariable in variableCollection.Variables)
         {
             using var variableContext = _variables.AddVariableToContext(identifier?.Identifier, iteratorVariable);
-            GenerateBlocks(node.Blocks);
+            if (node.Condition is null || IsBooleanExpressionTrue(node.Condition))
+            {
+                GenerateBlocks(node.Blocks);
+            }
         }
 
         return true;

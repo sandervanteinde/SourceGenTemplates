@@ -1,6 +1,6 @@
 ﻿::foreach class
-    where partial
-    as c;
+    as c
+    where c is partial;
 
 ::filename c;
 using System;

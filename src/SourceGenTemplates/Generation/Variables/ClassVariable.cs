@@ -15,12 +15,12 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration) : Variable(V
         return classDeclaration.Identifier.ToString();
     }
 
-    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
+    protected override bool MatchCondition(PredefinedConditionNode predefinedCondition)
     {
-        return foreachCondition.Type switch
+        return predefinedCondition.Type switch
         {
-            ForeachConditionNodeType.Partial => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword),
-            ForeachConditionNodeType.AccessModifier => ((AccessModifierForEachConditionNode)foreachCondition).AccessModifier.IsApplicableFor(
+            PredefinedConditionNodeType.Partial => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword),
+            PredefinedConditionNodeType.AccessModifier => ((AccessModifierPredefinedConditionNode)predefinedCondition).AccessModifier.IsApplicableFor(
                 classDeclaration.Modifiers
             )
         };

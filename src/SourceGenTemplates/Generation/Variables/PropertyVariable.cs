@@ -11,12 +11,14 @@ public class PropertyVariable(PropertyDeclarationSyntax property) : Variable(Var
         return property.Identifier.ToString();
     }
 
-    protected override bool MatchCondition(LogicalOperationForeachCondition foreachCondition)
+    protected override bool MatchCondition(PredefinedConditionNode predefinedCondition)
     {
-        return foreachCondition.Type switch
+        return predefinedCondition.Type switch
         {
-            ForeachConditionNodeType.Partial => false,
-            ForeachConditionNodeType.AccessModifier => ((AccessModifierForEachConditionNode)foreachCondition).AccessModifier.IsApplicableFor(property.Modifiers)
+            PredefinedConditionNodeType.Partial => false,
+            PredefinedConditionNodeType.AccessModifier => ((AccessModifierPredefinedConditionNode)predefinedCondition).AccessModifier.IsApplicableFor(
+                property.Modifiers
+            )
         };
     }
 

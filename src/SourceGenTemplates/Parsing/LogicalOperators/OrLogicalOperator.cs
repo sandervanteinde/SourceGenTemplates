@@ -1,12 +1,12 @@
 ﻿using System.Text;
-using SourceGenTemplates.Parsing.Foreach.Conditions;
+using SourceGenTemplates.Parsing.ControlDirectives;
 
 namespace SourceGenTemplates.Parsing.LogicalOperators;
 
-public class OrLogicalOperator(ForeachConditionNode left, ForeachConditionNode right) : LogicalOperator(LogicalOperatorType.Or)
+public class OrLogicalOperator(BooleanExpressionNode left, BooleanExpressionNode right) : LogicalOperator(LogicalOperatorType.Or)
 {
-    public ForeachConditionNode Left => left;
-    public ForeachConditionNode Right => right;
+    public BooleanExpressionNode Left => left;
+    public BooleanExpressionNode Right => right;
 
     public override int Precedence => 1;
 

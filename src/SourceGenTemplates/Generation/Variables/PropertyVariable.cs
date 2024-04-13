@@ -8,7 +8,7 @@ public class PropertyVariable(PropertyDeclarationSyntax property)
     : Variable(VariableKind.Property)
         , IVariableWithStringRepresentation
 {
-    public string GetCodeRepresentation()
+    public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return property.Identifier.ToString();
     }

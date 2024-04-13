@@ -187,7 +187,7 @@ public class Tokenizer(string sourceText)
 
             endIndex++;
 
-            while (char.IsLetterOrDigit(span[endIndex]))
+            while (char.IsLetterOrDigit(span[endIndex]) || span[endIndex] == '_')
             {
                 endIndex++;
             }
@@ -221,6 +221,8 @@ public class Tokenizer(string sourceText)
                 "readonly" => new ReadonlyToken(namePosition),
                 "to" => new ToToken(namePosition),
                 "pascalcase" => new PascalCaseToken(namePosition),
+                "camelcase" => new CamelCaseToken(namePosition),
+                "escape_keywords" => new EscapeKeywordToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }

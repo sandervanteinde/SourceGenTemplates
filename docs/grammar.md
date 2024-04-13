@@ -67,9 +67,9 @@ variable_expression = (identifier, [ mutator-expression ])
     
 mutator_expression = "to", mutator_operand, [ mutator_expression ].
 
-mutator_operand = "pascalcase".
+mutator_operand = "pascalcase", "camelcase", "escape_keywords".
 
-property_access = ".", identifier, [ property_access ]
+property_access = ".", identifier, [ property_access ].
 
 context_switch = "::".
 

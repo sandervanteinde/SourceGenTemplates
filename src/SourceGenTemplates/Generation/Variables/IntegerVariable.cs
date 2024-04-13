@@ -7,7 +7,7 @@ public class IntegerVariable(int value)
     : Variable(VariableKind.Integer)
         , IVariableWithStringRepresentation
 {
-    public string GetCodeRepresentation()
+    public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return value.ToString();
     }

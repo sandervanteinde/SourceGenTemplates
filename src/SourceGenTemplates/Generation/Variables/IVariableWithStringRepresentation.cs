@@ -2,5 +2,5 @@
 
 public interface IVariableWithStringRepresentation
 {
-    string GetCodeRepresentation();
+    string GetCodeRepresentation(CompilationContext compilationContext);
 }

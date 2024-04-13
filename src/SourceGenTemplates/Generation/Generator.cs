@@ -18,7 +18,7 @@ namespace SourceGenTemplates.Generation;
 public class Generator(string fileName, FileNode file, GeneratorExecutionContext context, CompilationContext compilationContext)
 {
     private readonly StringBuilder _sb = new();
-    private readonly VariableContext _variables = new();
+    private readonly VariableContext _variables = new(compilationContext);
 
     public void AddToOutput()
     {
@@ -59,7 +59,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
             throw new ParserException("Value could not be represented as a string", node.VariableExpression.Token);
         }
 
-        _sb.Append(variableWithStringRepresentation.GetCodeRepresentation());
+        _sb.Append(variableWithStringRepresentation.GetCodeRepresentation(compilationContext));
         return true;
     }
 
@@ -176,7 +176,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
             throw new ParserException("Value could not be represented as a string", identifier);
         }
 
-        return variableWithStringRepresentation.GetCodeRepresentation();
+        return variableWithStringRepresentation.GetCodeRepresentation(compilationContext);
     }
 
     private bool GenerateForeachDirectiveNode(ForeachNode node)

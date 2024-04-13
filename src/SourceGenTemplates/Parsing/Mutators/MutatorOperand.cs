@@ -2,5 +2,7 @@
 
 public enum MutatorOperand
 {
-    PascalCase
+    PascalCase,
+    CamelCase,
+    EscapeKeyword
 }

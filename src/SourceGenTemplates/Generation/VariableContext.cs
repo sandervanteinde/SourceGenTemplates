@@ -7,7 +7,7 @@ using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation;
 
-public class VariableContext
+public class VariableContext(CompilationContext compilationContext)
 {
     private readonly Dictionary<string, Variable> _variables = [];
 
@@ -73,7 +73,7 @@ public class VariableContext
         {
             while (mutator is not null)
             {
-                variable = mutator.Mutate(variable);
+                variable = mutator.Mutate(variable, compilationContext);
                 mutator = mutator.Mutator;
             }
 

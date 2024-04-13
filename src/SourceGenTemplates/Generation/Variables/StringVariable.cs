@@ -5,7 +5,7 @@ namespace SourceGenTemplates.Generation.Variables;
 
 public class StringVariable(string value) : Variable(VariableKind.String), IVariableWithStringRepresentation
 {
-    public string GetCodeRepresentation()
+    public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return value;
     }

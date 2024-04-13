@@ -97,8 +97,16 @@ public class Parser(Tokenizer tokenizer)
             return null;
         }
 
-        var pascalCaseToken = ConsumeExpectedToken<PascalCaseToken>("Invalid mutator operand");
-        return new MutatorExpressionNode(MutatorOperand.PascalCase, pascalCaseToken, TryParseMutatorExpression());
+        var currentToken = tokenizer.Consume();
+        var operand = currentToken.Type switch
+        {
+            TokenType.PascalCase => MutatorOperand.PascalCase,
+            TokenType.CamelCase => MutatorOperand.CamelCase,
+            TokenType.EscapeKeyword => MutatorOperand.EscapeKeyword,
+            _ => throw new ParserException("Unknown mutator operand", currentToken)
+        };
+
+        return new MutatorExpressionNode(operand, currentToken, TryParseMutatorExpression());
     }
 
     private PropertyAccessNode? TryParsePropertyAccessNode()

@@ -1,20 +1,15 @@
-﻿namespace SourceGenTemplates.Sample;
+﻿using System;
+
+namespace SourceGenTemplates.Sample;
 
 public partial class Tester
 {
-    private readonly int _readonlyTest;
-    private int _test;
-    public int String { get; set; }
-    internal string FirstName { get; set; }
-    protected string LastName { get; set; }
-    private string Test { get; set; }
-}
+    private string _string;
+    private int _integer;
+    private ClassInDifferentNamespace _class;
 
-public class Test
-{
-}
-
-public partial class Tester2
-{
-    public int String { get; set; }
+    public void Print()
+    {
+        Console.WriteLine(new { _string, _integer, _class } );
+    }
 }

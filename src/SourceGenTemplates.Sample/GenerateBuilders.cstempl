@@ -1,18 +1,26 @@
-﻿::foreach var c in class
-  where c is partial;
-::filename c;
+﻿::foreach var classRef in class
+  where classRef is partial;
+::filename classRef;
 using System;
 
-namespace ::c.Namespace::;
+namespace ::classRef.Namespace::;
 
-partial class ::c::
+partial class ::classRef::
 {
-   public void PrintFields()
-   {
-        ::foreach var field in c.Fields
+
+    ::foreach var field in classRef.Fields
             where not field is readonly and field is private;
-        Console.WriteLine("::field to pascalcase::");
-        ::end;
+    public ::classRef:: With::field to pascalcase::(::field.Type:: ::field to camelcase to escape_keywords::)
+    {
+        ::field:: = ::field to camelcase to escape_keywords::;
+        return this;
     }
+    
+    public ::classRef:: Without::field to pascalcase::()
+    {
+        ::field:: = default(::field.Type::);
+        return this;
+    }
+    ::end;
 }
 ::end;

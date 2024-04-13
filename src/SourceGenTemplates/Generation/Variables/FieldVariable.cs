@@ -10,7 +10,7 @@ public class FieldVariable(FieldDeclarationSyntax fieldDeclaration)
     : Variable(VariableKind.Field)
         , IVariableWithStringRepresentation
 {
-    public string GetCodeRepresentation()
+    public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return fieldDeclaration.Declaration
             .Variables.First()
@@ -31,6 +31,10 @@ public class FieldVariable(FieldDeclarationSyntax fieldDeclaration)
 
     protected override Variable? TryAccessProperty(IdentifierToken identifier)
     {
-        return null;
+        return identifier.Identifier switch
+        {
+            "Type" => new TypeVariable(fieldDeclaration.Declaration.Type),
+            _ => null
+        };
     }
 }

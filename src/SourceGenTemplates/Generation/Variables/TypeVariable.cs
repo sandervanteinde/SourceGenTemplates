@@ -1,17 +1,21 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation.Variables;
 
-public class NamespaceVariable(BaseNamespaceDeclarationSyntax @namespace)
-    : Variable(VariableKind.Namespace)
+public class TypeVariable(TypeSyntax typeDeclarationSyntax)
+    : Variable(VariableKind.Type)
         , IVariableWithStringRepresentation
-
 {
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
-        return @namespace.Name.ToFullString();
+        var model = compilationContext.GetSemanticModel(typeDeclarationSyntax.SyntaxTree);
+        var symbolInfo = model.GetSymbolInfo(typeDeclarationSyntax)
+            .Symbol as INamedTypeSymbol;
+
+        return symbolInfo!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     }
 
     protected override bool MatchCondition(PredefinedConditionNode predefinedCondition)

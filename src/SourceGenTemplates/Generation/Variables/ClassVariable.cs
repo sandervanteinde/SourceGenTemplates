@@ -12,7 +12,7 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration)
     : Variable(VariableKind.Class),
         IVariableWithStringRepresentation
 {
-    public string GetCodeRepresentation()
+    public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return classDeclaration.Identifier.ToString();
     }

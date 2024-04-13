@@ -31,5 +31,7 @@ public enum TokenType
     Var,
     Readonly,
     To,
-    PascalCase
+    PascalCase,
+    CamelCase,
+    EscapeKeyword
 }

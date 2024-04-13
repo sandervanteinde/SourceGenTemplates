@@ -8,5 +8,6 @@ public enum VariableKind
     Collection,
     Property,
     Field,
-    String
+    String,
+    Type
 }

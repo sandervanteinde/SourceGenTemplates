@@ -26,5 +26,6 @@ public enum TokenType
     And,
     Not,
     Is,
-    If
+    If,
+    Else
 }

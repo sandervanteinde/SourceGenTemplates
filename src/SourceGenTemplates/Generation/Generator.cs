@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;
+using SourceGenTemplates.Parsing.ControlDirectives;
 using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
@@ -70,9 +71,37 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         if (IsBooleanExpressionTrue(@if.BooleanExpression))
         {
             GenerateBlocks(@if.Blocks);
+            return true;
         }
 
+        var elseExpression = @if.ElseExpression;
+
+        while (elseExpression is not null)
+        {
+            elseExpression = elseExpression.Type switch
+            {
+                ElseNodeType.Else => ParseElse((ElseElseExpressionNode)elseExpression),
+                ElseNodeType.ElseIf => ParseElseIf((ElseIfElseExpressionNode)elseExpression)
+            };
+        }
         return true;
+
+        ElseExpressionNode? ParseElse(ElseElseExpressionNode elseExpression)
+        {
+            GenerateBlocks(elseExpression.Blocks);
+            return null;
+        }
+
+        ElseExpressionNode? ParseElseIf(ElseIfElseExpressionNode elseIfExpression)
+        {
+            if (IsBooleanExpressionTrue(elseIfExpression.BooleanExpression))
+            {
+                GenerateBlocks(elseIfExpression.Blocks);
+                return null;
+            }
+
+            return elseIfExpression.ElseExpression;
+        }
     }
 
     private bool IsBooleanExpressionTrue(BooleanExpressionNode booleanExpressionNode)

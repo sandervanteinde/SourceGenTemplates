@@ -16,12 +16,12 @@ partial class ::c::
 
             ::if p is public;
                 Console.WriteLine("Public property ::p::");
-            ::end;
-            ::if p is protected;
+            ::else if p is protected;
                 Console.WriteLine("Protected property ::p::");
-            ::end;
-            ::if p is internal;
+            ::else if p is internal;
                 Console.WriteLine("Internal property ::p::");
+            ::else;
+                Console.WriteLine("Property ::p:: is not public, protected or internal");
             ::end;
         ::end;
     }

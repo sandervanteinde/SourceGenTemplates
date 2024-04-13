@@ -2,4 +2,4 @@
 
 namespace SourceGenTemplates.Tokenization;
 
-public class IfToken(LinePositionSpan position): Token(Tokenization.TokenType.If, position);
+public class IfToken(LinePositionSpan position) : Token(TokenType.If, position);

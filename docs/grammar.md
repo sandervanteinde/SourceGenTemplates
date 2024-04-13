@@ -38,8 +38,13 @@ foreach = "foreach", foreach_target,
     
 if_statement = "if", boolean_expression, context_termination,
     { block },
+    [ else_statement ]
     context_switch, "end", context_termination.
-    
+
+else_statement = 
+    ( "else", context_termination, { block } )
+    | ( "else", "if", boolean_expression, context_termination, { block }, [ else_statement ] ).
+
 boolean_expression = (variable_expression, "is", foreach_condition) | (foreach_condition, "is", variable_expression).
 
 foreach_target = "assembly" | variable_expression. (* variable_expression must be pointing to a valid collection *)

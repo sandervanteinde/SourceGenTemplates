@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SourceGenTemplates.Parsing.BlockNodes;
+using SourceGenTemplates.Parsing.ControlDirectives;
 using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
@@ -187,16 +188,42 @@ public class Parser(Tokenizer tokenizer)
             var booleanExpressionNode = ParseBooleanExpressionNode();
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected if statement to be terminated with a ;");
             var blocks = ParseBlocks();
+            var elseExpression = TryParseElseExpressionNode();
             _ = ConsumeExpectedToken<CodeContextToken>("Expected ::end");
             _ = ConsumeExpectedToken<EndToken>("Expected ::end");
             _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
-            var ifNode = new IfNode(booleanExpressionNode, blocks);
+            var ifNode = new IfNode(booleanExpressionNode, blocks, elseExpression);
             directiveNode = new IfDirectiveNode(ifNode);
             return true;
         }
 
         directiveNode = null!;
         return false;
+    }
+
+    private ElseExpressionNode? TryParseElseExpressionNode()
+    {
+        if (!tokenizer.TryPeek(out var possibleCodeContextSwitch) || possibleCodeContextSwitch!.TokenType != TokenType.CodeContextSwitch
+            || !tokenizer.TryPeek(1, out var afterCodeContext) || afterCodeContext!.TokenType is not TokenType.Else)
+        {
+            return null;
+        }
+
+        tokenizer.Consume(2);
+
+        if (tokenizer.ConsumeIfNextIsOfType(TokenType.If))
+        {
+            var booleanExpression = ParseBooleanExpressionNode();
+            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected else if statement to end with a ;");
+            var blocks = ParseBlocks();
+            var elseExpression = TryParseElseExpressionNode();
+            return new ElseIfElseExpressionNode(blocks, booleanExpression, elseExpression);
+        }
+
+        _ = ConsumeExpectedToken<CodeContextEndToken>("Expected else if statement to end with a ;");
+
+        var elseBlocks = ParseBlocks();
+        return new ElseElseExpressionNode(elseBlocks);
     }
 
     private BooleanExpressionNode ParseBooleanExpressionNode()

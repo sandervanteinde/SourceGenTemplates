@@ -8,9 +8,11 @@ using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation.Variables;
 
-public class ClassVariable(ClassDeclarationSyntax classDeclaration) : Variable(VariableKind.Class)
+public class ClassVariable(ClassDeclarationSyntax classDeclaration)
+    : Variable(VariableKind.Class),
+        IVariableWithStringRepresentation
 {
-    public override string GetCodeRepresentation()
+    public string GetCodeRepresentation()
     {
         return classDeclaration.Identifier.ToString();
     }
@@ -22,7 +24,8 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration) : Variable(V
             PredefinedConditionNodeType.Partial => classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword),
             PredefinedConditionNodeType.AccessModifier => ((AccessModifierPredefinedConditionNode)predefinedCondition).AccessModifier.IsApplicableFor(
                 classDeclaration.Modifiers
-            )
+            ),
+            PredefinedConditionNodeType.Readonly => false
         };
     }
 
@@ -32,8 +35,19 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration) : Variable(V
         {
             "Namespace" => new NamespaceVariable(FindNamespace()),
             "Properties" => GetProperties(),
+            "Fields" => GetFields(),
             _ => null
         };
+    }
+
+    private VariableCollection GetFields()
+    {
+        var fields = classDeclaration.Members
+            .OfType<FieldDeclarationSyntax>()
+            .Select(field => new FieldVariable(field))
+            .ToList();
+
+        return new VariableCollection(fields);
     }
 
     private VariableCollection GetProperties()

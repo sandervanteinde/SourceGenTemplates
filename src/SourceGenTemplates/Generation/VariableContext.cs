@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SourceGenTemplates.Generation.Variables;
+using SourceGenTemplates.Parsing.Mutators;
 using SourceGenTemplates.Parsing.VariableExpressions;
 using SourceGenTemplates.Tokenization;
 
@@ -44,9 +45,15 @@ public class VariableContext
     {
         return variableExpression.Type switch
         {
-            VariableExpressionNodeType.VariableAccess => GetOrThrow(((VariableExpressionNodeVariableAccess)variableExpression).Identifier),
+            VariableExpressionNodeType.VariableAccess => GetOrThrowVariableAccess((VariableExpressionNodeVariableAccess)variableExpression),
             VariableExpressionNodeType.PropertyAccess => GetOrThrowPropertyAccess((VariableExpressionNodePropertyAccess)variableExpression)
         };
+
+        Variable GetOrThrowVariableAccess(VariableExpressionNodeVariableAccess variableAccess)
+        {
+            var variable = GetOrThrow(variableAccess.Identifier);
+            return ApplyMutator(variable, variableAccess.Mutator);
+        }
 
         Variable GetOrThrowPropertyAccess(VariableExpressionNodePropertyAccess propertyAccess)
         {
@@ -57,6 +64,17 @@ public class VariableContext
             {
                 variable = variable.AccessProperty(currentPropertyAccess.Identifier);
                 currentPropertyAccess = currentPropertyAccess.PropertyAccess;
+            }
+
+            return ApplyMutator(variable, propertyAccess.Mutator);
+        }
+
+        Variable ApplyMutator(Variable variable, MutatorExpressionNode? mutator)
+        {
+            while (mutator is not null)
+            {
+                variable = mutator.Mutate(variable);
+                mutator = mutator.Mutator;
             }
 
             return variable;

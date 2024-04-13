@@ -1,0 +1,18 @@
+﻿::foreach var c in class
+  where c is partial;
+::filename c;
+using System;
+
+namespace ::c.Namespace::;
+
+partial class ::c::
+{
+   public void PrintFields()
+   {
+        ::foreach var field in c.Fields
+            where not field is readonly and field is private;
+        Console.WriteLine("::field to pascalcase::");
+        ::end;
+    }
+}
+::end;

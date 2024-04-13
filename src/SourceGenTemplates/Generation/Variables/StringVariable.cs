@@ -3,11 +3,11 @@ using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation.Variables;
 
-public class ValueVariable(object value) : Variable(VariableKind.Value)
+public class StringVariable(string value) : Variable(VariableKind.String), IVariableWithStringRepresentation
 {
-    public override string GetCodeRepresentation()
+    public string GetCodeRepresentation()
     {
-        return value.ToString();
+        return value;
     }
 
     protected override bool MatchCondition(PredefinedConditionNode predefinedCondition)

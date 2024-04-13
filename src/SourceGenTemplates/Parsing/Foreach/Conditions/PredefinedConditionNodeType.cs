@@ -3,5 +3,6 @@
 public enum PredefinedConditionNodeType
 {
     Partial,
-    AccessModifier
+    AccessModifier,
+    Readonly
 }

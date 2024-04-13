@@ -20,7 +20,12 @@ public class Tokenizer(string sourceText)
 
     public bool ConsumeIfNextIsOfType(TokenType type)
     {
-        if (TryPeek(out var token) && token!.Type == type)
+        return ConsumeIfNextIsOfType(type, out _);
+    }
+
+    public bool ConsumeIfNextIsOfType(TokenType type, out Token token)
+    {
+        if (TryPeek(out token!) && token!.Type == type)
         {
             Consume();
             return true;
@@ -213,6 +218,9 @@ public class Tokenizer(string sourceText)
                 "if" => new IfToken(namePosition),
                 "is" => new IsToken(namePosition),
                 "else" => new ElseToken(namePosition),
+                "readonly" => new ReadonlyToken(namePosition),
+                "to" => new ToToken(namePosition),
+                "pascalcase" => new PascalCaseToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }

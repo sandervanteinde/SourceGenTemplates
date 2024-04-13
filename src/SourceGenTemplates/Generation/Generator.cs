@@ -11,6 +11,7 @@ using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.LogicalOperators;
+using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation;
 
@@ -52,7 +53,13 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
     private bool GenerateDirectiveBlockNode(VariableInsertionBlockNode node)
     {
         var value = _variables.GetOrThrow(node.VariableExpression);
-        _sb.Append(value.GetCodeRepresentation());
+
+        if (value is not IVariableWithStringRepresentation variableWithStringRepresentation)
+        {
+            throw new ParserException("Value could not be represented as a string", node.VariableExpression.Token);
+        }
+
+        _sb.Append(variableWithStringRepresentation.GetCodeRepresentation());
         return true;
     }
 
@@ -153,12 +160,23 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         OutputCurrentContentsToFile();
         fileName = node.Expression.Type switch
         {
-            ExpressionType.Identifier => _variables.GetOrThrow(((IdentifierExpressionNode)node.Expression).Identifier)
-                .GetCodeRepresentation(),
+            ExpressionType.Identifier => GetStringValueOfVariableExpression(((IdentifierExpressionNode)node.Expression).Identifier),
             ExpressionType.String => ((StringExpressionNode)node.Expression).Value.Value,
             ExpressionType.Number => throw new ParserException("Numbers are not valid file names", node.Expression.Token)
         };
         return true;
+    }
+
+    private string GetStringValueOfVariableExpression(IdentifierToken identifier)
+    {
+        var variable = _variables.GetOrThrow(identifier);
+
+        if (variable is not IVariableWithStringRepresentation variableWithStringRepresentation)
+        {
+            throw new ParserException("Value could not be represented as a string", identifier);
+        }
+
+        return variableWithStringRepresentation.GetCodeRepresentation();
     }
 
     private bool GenerateForeachDirectiveNode(ForeachNode node)
@@ -194,7 +212,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
         for (var i = start; i < end; i++)
         {
-            using var variableContext = _variables.AddVariableToContext(node.Identifier?.Identifier, new ValueVariable(i));
+            using var variableContext = _variables.AddVariableToContext(node.Identifier?.Identifier, new IntegerVariable(i));
             GenerateBlocks(node.Blocks);
         }
 

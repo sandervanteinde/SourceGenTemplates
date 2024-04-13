@@ -50,7 +50,7 @@ boolean_expression = (variable_expression, "is", predefined_conditions)
 
 foreach_target = "class" | variable_expression. (* variable_expression must be pointing to a valid collection *)
 
-predefined_conditions = "partial" | access_modifier
+predefined_conditions = "partial" | access_modifier | "readonly".
 
 logical_operator = or_operator | and_operator | not_operator.
 
@@ -62,8 +62,12 @@ range = number, "..", number.
 
 identifier = letter, { letter | number }.
 
-variable_expression = identifier
-    | (identifier, property_access).
+variable_expression = (identifier, [ mutator-expression ])
+    | (identifier, property_access, [ mutator-expression ]).
+    
+mutator_expression = "to", mutator_operand, [ mutator_expression ].
+
+mutator_operand = "pascalcase".
 
 property_access = ".", identifier, [ property_access ]
 

@@ -28,5 +28,8 @@ public enum TokenType
     Is,
     If,
     Else,
-    Var
+    Var,
+    Readonly,
+    To,
+    PascalCase
 }

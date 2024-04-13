@@ -7,8 +7,6 @@ public abstract class Variable(VariableKind kind)
 {
     public VariableKind Kind => kind;
 
-    public abstract string GetCodeRepresentation();
-
     protected abstract bool MatchCondition(PredefinedConditionNode predefinedCondition);
 
     protected abstract Variable? TryAccessProperty(IdentifierToken identifier);

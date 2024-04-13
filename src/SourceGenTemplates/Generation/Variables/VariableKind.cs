@@ -2,9 +2,11 @@
 
 public enum VariableKind
 {
-    Value,
+    Integer,
     Class,
     Namespace,
     Collection,
-    Property
+    Property,
+    Field,
+    String
 }

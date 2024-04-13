@@ -7,6 +7,7 @@ using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Parsing.LogicalOperators;
+using SourceGenTemplates.Parsing.Mutators;
 using SourceGenTemplates.Parsing.VariableExpressions;
 using SourceGenTemplates.Tokenization;
 
@@ -79,13 +80,25 @@ public class Parser(Tokenizer tokenizer)
 
         var identifierToken = ConsumeExpectedToken<IdentifierToken>("Expected identifier token");
         var propertyAccess = TryParsePropertyAccessNode();
+        var mutator = TryParseMutatorExpression();
 
         variableExpressionNode = propertyAccess switch
         {
-            null => new VariableExpressionNodeVariableAccess(identifierToken),
-            not null => new VariableExpressionNodePropertyAccess(identifierToken, propertyAccess)
+            null => new VariableExpressionNodeVariableAccess(identifierToken, mutator),
+            not null => new VariableExpressionNodePropertyAccess(identifierToken, propertyAccess, mutator)
         };
         return true;
+    }
+
+    private MutatorExpressionNode? TryParseMutatorExpression()
+    {
+        if (!tokenizer.ConsumeIfNextIsOfType(TokenType.To))
+        {
+            return null;
+        }
+
+        var pascalCaseToken = ConsumeExpectedToken<PascalCaseToken>("Invalid mutator operand");
+        return new MutatorExpressionNode(MutatorOperand.PascalCase, pascalCaseToken, TryParseMutatorExpression());
     }
 
     private PropertyAccessNode? TryParsePropertyAccessNode()
@@ -280,6 +293,10 @@ public class Parser(Tokenizer tokenizer)
         if (TryParseAccessModifier(out var accessModifier, out var accessModifierToken))
         {
             predefinedConditionNode = new AccessModifierPredefinedConditionNode(accessModifier!, accessModifierToken);
+        }
+        else if (tokenizer.ConsumeIfNextIsOfType(TokenType.Readonly, out var readonlyToken))
+        {
+            predefinedConditionNode = new ReadonlyPredefinedConditionNode(readonlyToken);
         }
         else
         {

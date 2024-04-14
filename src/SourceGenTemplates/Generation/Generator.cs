@@ -119,8 +119,15 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         return booleanExpressionNode.ExpressionType switch
         {
             BooleanExpressionType.Simple => IsSimpleBooleanExpressionTrue((SimpleComparisonBooleanExpressionNode)booleanExpressionNode),
-            BooleanExpressionType.BooleanOperator => IsBooleanOperatorExpressionTrue((BooleanOperatorBooleanExpressionNode)booleanExpressionNode)
+            BooleanExpressionType.BooleanOperator => IsBooleanOperatorExpressionTrue((BooleanOperatorBooleanExpressionNode)booleanExpressionNode),
+            BooleanExpressionType.HasAttribute => IsAttributeExpressionTrue((HasAttributeBooleanExpressionNode)booleanExpressionNode)
         };
+    }
+
+    private bool IsAttributeExpressionTrue(HasAttributeBooleanExpressionNode hasAttributeBooleanExpressionNode)
+    {
+        var variable = _variables.GetOrThrow(hasAttributeBooleanExpressionNode.VariableExpression);
+        return variable.HasAttributeWithName(hasAttributeBooleanExpressionNode.String);
     }
 
     private bool IsBooleanOperatorExpressionTrue(BooleanOperatorBooleanExpressionNode booleanOperatorBooleanExpressionNode)

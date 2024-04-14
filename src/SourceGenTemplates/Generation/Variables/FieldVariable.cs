@@ -37,4 +37,9 @@ public class FieldVariable(FieldDeclarationSyntax fieldDeclaration)
             _ => null
         };
     }
+
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
+    {
+        return fieldDeclaration.AttributeLists;
+    }
 }

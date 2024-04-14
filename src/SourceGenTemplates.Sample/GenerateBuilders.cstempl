@@ -1,5 +1,5 @@
 ﻿::foreach var classRef in class
-  where classRef is partial;
+  where classRef is partial and classRef has_attribute "GenerateBuilder";
 ::filename classRef;
 using System;
 

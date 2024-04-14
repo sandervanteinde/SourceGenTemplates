@@ -1,4 +1,6 @@
-﻿using SourceGenTemplates.Parsing.Foreach.Conditions;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation.Variables;
@@ -16,6 +18,11 @@ public class StringVariable(string value) : Variable(VariableKind.String), IVari
     }
 
     protected override Variable? TryAccessProperty(IdentifierToken identifier)
+    {
+        return null;
+    }
+
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return null;
     }

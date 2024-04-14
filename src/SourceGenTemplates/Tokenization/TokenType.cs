@@ -33,5 +33,6 @@ public enum TokenType
     To,
     PascalCase,
     CamelCase,
-    EscapeKeyword
+    EscapeKeyword,
+    HasAttribute
 }

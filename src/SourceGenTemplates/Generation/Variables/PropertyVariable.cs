@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Tokenization;
 
@@ -31,5 +32,10 @@ public class PropertyVariable(PropertyDeclarationSyntax property)
         {
             _ => null
         };
+    }
+
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
+    {
+        return property.AttributeLists;
     }
 }

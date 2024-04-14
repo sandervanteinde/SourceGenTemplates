@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Tokenization;
 
@@ -22,5 +23,10 @@ public class NamespaceVariable(BaseNamespaceDeclarationSyntax @namespace)
     protected override Variable? TryAccessProperty(IdentifierToken identifier)
     {
         return null;
+    }
+
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
+    {
+        return @namespace.AttributeLists;
     }
 }

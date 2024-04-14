@@ -27,4 +27,9 @@ public class TypeVariable(TypeSyntax typeDeclarationSyntax)
     {
         return null;
     }
+
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
+    {
+        return null;
+    }
 }

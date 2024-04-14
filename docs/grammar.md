@@ -46,6 +46,7 @@ else_statement =
 
 boolean_expression = (variable_expression, "is", predefined_conditions)
     | (predefined_conditions, "is", variable_expression) 
+    | (variable_expression, "has_attribute", string)
     | logical_operator.
 
 foreach_target = "class" | variable_expression. (* variable_expression must be pointing to a valid collection *)

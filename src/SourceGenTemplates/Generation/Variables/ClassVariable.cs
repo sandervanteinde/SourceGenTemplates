@@ -40,6 +40,11 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration)
         };
     }
 
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
+    {
+        return classDeclaration.AttributeLists;
+    }
+
     private VariableCollection GetFields()
     {
         var fields = classDeclaration.Members

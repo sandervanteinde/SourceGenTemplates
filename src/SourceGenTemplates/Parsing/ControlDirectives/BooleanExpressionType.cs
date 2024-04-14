@@ -3,5 +3,6 @@
 public enum BooleanExpressionType
 {
     Simple,
-    BooleanOperator
+    BooleanOperator,
+    HasAttribute
 }

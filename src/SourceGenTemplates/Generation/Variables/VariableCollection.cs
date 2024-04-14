@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Tokenization;
 
@@ -15,6 +17,11 @@ public class VariableCollection(IReadOnlyCollection<Variable> variables) : Varia
     }
 
     protected override Variable? TryAccessProperty(IdentifierToken identifier)
+    {
+        return null;
+    }
+
+    protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return null;
     }

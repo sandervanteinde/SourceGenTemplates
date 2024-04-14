@@ -293,6 +293,12 @@ public class Parser(Tokenizer tokenizer)
 
         if (statementStartsWithVariableExpression)
         {
+            if (tokenizer.ConsumeIfNextIsOfType(TokenType.HasAttribute))
+            {
+                var stringToken = ConsumeExpectedToken<StringToken>("Expected has_attribute to be followed by a double-quoted string");
+                return new HasAttributeBooleanExpressionNode(variableExpressionNode!, stringToken);
+            }
+
             _ = ConsumeExpectedToken<IsToken>("Expected 'is'");
         }
 

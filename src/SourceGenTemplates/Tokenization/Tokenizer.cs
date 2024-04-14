@@ -223,6 +223,7 @@ public class Tokenizer(string sourceText)
                 "pascalcase" => new PascalCaseToken(namePosition),
                 "camelcase" => new CamelCaseToken(namePosition),
                 "escape_keywords" => new EscapeKeywordToken(namePosition),
+                "has_attribute" => new HasAttributeToken(namePosition),
                 _ => new IdentifierToken(namePosition, word)
             };
         }

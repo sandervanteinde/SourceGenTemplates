@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Control directives - C# Source Generation templates</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Control directives";
+        var mkdocs_page_input_path = "language/control-directives.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> C# Source Generation templates
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/first-template/">First template</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Samples</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../samples/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../samples/generate-builder/">Generate builder pattern</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Language</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../">Concepts</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Control directives</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#if-directive">If directive</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#for-range-directive">For range directive</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#foreach-directive">Foreach directive</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#the-class-predefined-collection">The class predefined collection</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#the-where-clause">The where clause</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../boolean-expressions/">Boolean expressions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mutators/">Mutators</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../grammar/">Grammar</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Variables</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/class/">Class</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/field/">Field</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/integer/">Integer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/namespace/">Namespace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/property/">Property</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/string/">String</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/type/">Type</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../variable-types/variable-collection/">Variable collection</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">C# Source Generation templates</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Language</li>
+      <li class="breadcrumb-item active">Control directives</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="control-directives">Control directives</h1>
+<p>The language supports multiple control directives which are explained here including examples.</p>
+<h2 id="if-directive">If directive</h2>
+<p>As with all programming languages, you can control your template with if statements. These work as you expect it to from other languages.</p>
+<p>The syntax for a <code>If directive</code> is:</p>
+<pre><code class="language-csharp">::if variable is condition;
+
+::endif;
+</code></pre>
+<p>Any <a href="../boolean-expressions/">boolean expression</a> can be used inside the if-statement</p>
+<h2 id="for-range-directive">For range directive</h2>
+<p>The <code>for range</code> directive is a directive that allows you to iterate over a range of integers.</p>
+<p>The syntax for a <code>for range</code> is:</p>
+<pre><code>::for var i in 1..10;
+  // Your code here
+::end;
+</code></pre>
+<p>In this case <code>i</code> is a variable and <code>1..10</code> is a range that you can define yourself. This can be a range from any positive number to a higher positive number.</p>
+<h2 id="foreach-directive">Foreach directive</h2>
+<p>The <code>foreach</code> directive is similar to how a <code>foreach</code> in C# works. It iterates over a variable which contains multiple items.</p>
+<p>The basic syntax for a <code>foreach</code> is:</p>
+<pre><code>::foreach var item in collection;
+    // Your code here
+::end;
+</code></pre>
+<p>Where <code>collection</code> can be any variable which contains multiple items</p>
+<h3 id="the-class-predefined-collection">The class predefined collection</h3>
+<p>The <code>class</code> keyword is a keyword in the templating engine that contains all classes in your current assembly. This can be used as something to iterate over in the templating engine:</p>
+<pre><code class="language-csharp">::foreach var classRef in class;
+  // Your code for each class
+::end;
+
+</code></pre>
+<h3 id="the-where-clause">The where clause</h3>
+<p>The where clause can be added to filter your foreach before it reaching the templating engine. This performs better and reduces nesting of your file. This is equivalent to adding a <a href="#if-directive">if</a> directly after the foreach.</p>
+<p>An example of such where clause looks like this:</p>
+<p>Note how the syntax of the where is a <a href="../boolean-expressions/">boolean expression</a> just like the if-statement.
+Anything that an if-statement supports is also supported in a where clause.</p>
+<pre><code class="language-csharp">::foreach var classRef in class
+    where classRef is partial;
+    // Your code her
+::end;
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../" class="btn btn-neutral float-left" title="Concepts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../boolean-expressions/" class="btn btn-neutral float-right" title="Boolean expressions">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../boolean-expressions/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

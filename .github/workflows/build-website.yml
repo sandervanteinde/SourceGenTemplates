@@ -1,6 +1,6 @@
 ﻿name: Build GH-Pages
 env:
-  PUBLISH_DIR: wwwroot
+  PUBLISH_DIR: /wwwroot
 
 on:
   push:

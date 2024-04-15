@@ -36,12 +36,12 @@ jobs:
       - name: Install macros
         run: pip install mkdocs-macros-plugin
       - name: Build website
-        run: mkdocs build -d ../_site
+        run: mkdocs build
         working-directory: github-docs
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./
+          source: ./github-docs/site
           destination: ./_site
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

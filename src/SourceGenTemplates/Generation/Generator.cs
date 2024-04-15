@@ -217,7 +217,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         var start = node.Range.StartRange.Number;
         var end = node.Range.EndRange.Number;
 
-        for (var i = start; i < end; i++)
+        for (var i = start; i <= end; i++)
         {
             using var variableContext = _variables.AddVariableToContext(node.Identifier?.Identifier, new IntegerVariable(i));
             GenerateBlocks(node.Blocks);

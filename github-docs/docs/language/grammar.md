@@ -1,9 +1,7 @@
-# Grammar
+This page describes the grammar of the language. This is described in
+the [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form) format.
 
-The grammar of source generator template language is described
-in [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
-
-```ebnf
+```
 (* Spaces are always ignored unless stated otherwise *)
 
 file = { block }.
@@ -77,3 +75,4 @@ context_switch = "::".
 access_modifier: "public" | "private" | "protected" | "internal" | ("protected", "internal") | ("internal", "protected"), ("private", "protected") | ("protected", "private")
 
 context_termination = ";".
+```

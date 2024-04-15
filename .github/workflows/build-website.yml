@@ -1,6 +1,6 @@
 ﻿name: Build GH-Pages
 env:
-  PUBLISH_DIR: github-docs/site
+  PUBLISH_DIR: wwwroot
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       - name: Install macros
         run: pip install mkdocs-macros-plugin
       - name: Build website
-        run: mkdocs build -d ${{ env.PUBLISH_DIR }}
+        run: mkdocs build -f github-docs/mkdocs.yml -d ${{ env.PUBLISH_DIR }}
       - name: GitHub Pages
         if: success()
         uses: crazy-max/ghaction-github-pages@v1.5.1

@@ -1,5 +1,7 @@
 ﻿# C# Source Generators
 
+[![Last release build](https://github.com/sandervanteinde/SourceGenTemplates/actions/workflows/dotnet.yml/badge.svg?branch=master)](https://github.com/sandervanteinde/SourceGenTemplates/actions/workflows/dotnet.yml)
+
 C# Source Generators is, as the name suggests, a template driven way of writing source generators.
 
 Normal source generators can be created by creating an Analyzer package by yourself. With {{packagename}} the process of
@@ -14,6 +16,8 @@ Being able to extend your own code base has never been easier!
 Simply add it to your C# project using `dotnet package add SourceGenTemplates`.
 
 ## First template
-For writing your first template, please visit our documentation website for more information on how to start and detailed explanation of the templating language:
+
+For writing your first template, please visit our documentation website for more information on how to start and
+detailed explanation of the templating language:
 
 https://sandervanteinde.github.io/SourceGenTemplates/

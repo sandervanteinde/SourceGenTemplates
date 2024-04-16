@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <IsPackable>false</IsPackable>
+        <IsPackable>true</IsPackable>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
 
@@ -11,6 +11,10 @@
 
         <RootNamespace>SourceGenTemplates</RootNamespace>
         <PackageId>SourceGenTemplates</PackageId>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,9 +27,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\.editorconfig">
-            <Link>.editorconfig</Link>
-        </Content>
+        <None Include="$(OutputPath)/SourceGenTemplates.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
 

@@ -5,6 +5,12 @@ name: Pack and deploy NuGet package
 
 on:
   push:
+    paths:
+      - 'src/**/*'
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.sln'
+      - '.github/workflows/dotnet.yml'
     branches:
       - main
   pull_request:

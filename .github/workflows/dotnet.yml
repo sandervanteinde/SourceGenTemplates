@@ -12,10 +12,10 @@ on:
       - '**/*.sln'
       - '.github/workflows/dotnet.yml'
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build:

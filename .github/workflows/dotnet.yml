@@ -4,6 +4,7 @@
 name: Pack and deploy NuGet package
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'src/**/*'

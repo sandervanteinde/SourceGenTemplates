@@ -1,0 +1,47 @@
+﻿# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Pack and deploy NuGet package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore  -c Release /p:Version=${{ steps.gitversion.outputs.nuGetVersion}}
+      - name: Test
+        run: dotnet test --no-build --verbosity normal  -c Release
+
+      - name: Publish Generator Nuget to NuGet
+        run: dotnet nuget push ./artifacts/package/release/SourceGenTemplates.${{ steps.gitversion.outputs.nuGetVersion }}.nupkg -k ${NUGET_TOKEN}
+        env:
+          NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+        if: github.event_name != 'pull_request'

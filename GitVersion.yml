@@ -1,0 +1,5 @@
+﻿branches:
+  master:
+    is-mainline: true
+    increment: Patch
+mode: Mainline

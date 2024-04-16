@@ -38,6 +38,8 @@ Examples:
 
 When the resulting string is a known C# keyword, this keyword is escaped using the `@` notation. Useful in a context where using keywords is not allowed.
 
+Syntax: `variable to escape_keywords`
+
 Examples:
 
 | from    | to      |

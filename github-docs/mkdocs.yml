@@ -1,5 +1,8 @@
 site_name: C# Source Generation templates
 theme: readthedocs
+edit_uri: https://github.com/sandervanteinde/SourceGenTemplates/tree/master/github-docs/docs
+repo_url: https://github.com/sandervanteinde/SourceGenTemplates
+repo_name: GitHub
 plugins:
   - macros
 

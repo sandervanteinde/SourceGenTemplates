@@ -64,3 +64,60 @@ Anything that an if-statement supports is also supported in a where clause.
     // Your code her
 ::end;
 ```
+
+## Filename directive
+The filename directive can be utilized to modify the output of the source generator.
+By default, the source generator emits a `<fileName>.g.cs` file, where `fileName` is the same name (without path) of the `.cstempl` file.
+
+If you want to modify the name you can use the `::filename` directive to modify the output. 
+
+The directive can also be utilized in the middle of your template. As soon as the parser encounters a `::filename` directive,
+the output that was generated thus far is emitted to the previous file name.
+
+Using this directive is merely controlling the output for debugging purposes. If your IDE supports viewing source generation output, you can easily identify mistakes in your template.
+
+For example, giving that your assembly has two classes called `A` and `B`, then the following template generated the output below.
+```csharp
+::foreach var classRef in class;
+    ::filename classRef;
+    using System;
+
+    namespace SourceGenerators;
+
+    public class HelloFrom::classRef:: 
+    {
+        public static void HelloFromTemplates()
+        {
+            Console.WriteLine("::classRef:: was generated in a template!");
+        }
+    }
+::end;
+```
+Generates:
+```csharp
+// file A.g.cs
+using System;
+
+namespace SourceGenerators;
+
+public class HelloFromA
+{
+    public static void HelloFromTemplates()
+    {
+        Console.WriteLine("A was generated in a template!");
+    }
+}
+
+// file B.g.cs
+using System;
+
+namespace SourceGenerators;
+
+public class HelloFromB
+{
+    public static void HelloFromTemplates()
+    {
+        Console.WriteLine("B was generated in a template!");
+    }
+}
+```

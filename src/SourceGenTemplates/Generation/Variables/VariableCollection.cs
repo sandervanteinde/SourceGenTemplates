@@ -25,4 +25,9 @@ public class VariableCollection(IReadOnlyCollection<Variable> variables) : Varia
     {
         return null;
     }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return ReferenceEquals(rightValue, this);
+    }
 }

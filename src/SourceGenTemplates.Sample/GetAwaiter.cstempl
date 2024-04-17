@@ -1,0 +1,50 @@
+﻿using System.Runtime.CompilerServices;
+
+namespace System.Threading.Tasks;
+
+public static class TaskExtensions
+{
+    ::for var i in 2..20;
+    public static TaskAwaiter<(
+        ::for var j in 1..i;
+            T::j::
+            ::if not j is i;
+            ,
+            ::end;
+        ::end;
+    )> GetAwaiter<
+        ::for var j in 1..i;
+            T::j::
+            ::if not j is i;
+            ,
+            ::end;
+        ::end;
+    >(this (
+        ::for var j in 1..i;
+            Task<T::j::> var::j::
+            ::if not j is i;
+            ,
+            ::end;
+        ::end;
+    ) awaitableTasks)
+    {
+        return Task.WhenAll(
+            ::for var j in 1..i;
+                awaitableTasks.var::j::
+                ::if not j is i;
+                ,
+                ::end;
+            ::end;
+        )
+            .ContinueWith(_ => (
+                ::for var j in 1..i;
+                    awaitableTasks.var::j::.Result
+                    ::if not j is i;
+                    ,
+                    ::end;
+                ::end;
+            ))
+            .GetAwaiter();
+    }
+    ::end;
+}

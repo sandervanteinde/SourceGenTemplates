@@ -4,17 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenTemplates", "src\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenTemplates.Sample", "src\SourceGenTemplates.Sample\SourceGenTemplates.Sample.csproj", "{EE9745FB-6362-4840-9033-7213FA793A9D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github-docs", "github-docs", "{B89E49E9-6C40-4DD8-9F86-839401D5BBF6}"
-	ProjectSection(SolutionItems) = preProject
-		github-docs\mkdocs.yml = github-docs\mkdocs.yml
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenTemplates.Tests", "src\SourceGenTemplates.Tests\SourceGenTemplates.Tests.csproj", "{FA1C8F89-7919-46DA-9A20-A4679AF51AA3}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A14B6B47-C208-4B4B-BE3F-4145CF490658}"
-	ProjectSection(SolutionItems) = preProject
-		github-docs\docs\index.md = github-docs\docs\index.md
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +26,5 @@ Global
 		{FA1C8F89-7919-46DA-9A20-A4679AF51AA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{A14B6B47-C208-4B4B-BE3F-4145CF490658} = {B89E49E9-6C40-4DD8-9F86-839401D5BBF6}
 	EndGlobalSection
 EndGlobal

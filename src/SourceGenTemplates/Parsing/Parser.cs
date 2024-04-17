@@ -300,6 +300,11 @@ public class Parser(Tokenizer tokenizer)
             }
 
             _ = ConsumeExpectedToken<IsToken>("Expected 'is'");
+
+            if (TryParseVariableExpression(out var secondVariableExpression))
+            {
+                return new VariableComparisonBooleanExpressionNode(variableExpressionNode!, secondVariableExpression!);
+            }
         }
 
         PredefinedConditionNode predefinedConditionNode;
@@ -404,10 +409,21 @@ public class Parser(Tokenizer tokenizer)
 
     private RangeNode ParseRangeNode()
     {
-        var startIndex = ConsumeExpectedToken<NumberToken>("Expected for to be followed with a number");
+        var startIndex = ConsumeRangeValueNode();
         _ = ConsumeExpectedToken<DoubleDotToken>("Expected number of for loop to be followed with a range indicator (..)");
-        var endIndex = ConsumeExpectedToken<NumberToken>("Expected range to be closed with a final number");
+        var endIndex = ConsumeRangeValueNode();
         return new RangeNode(startIndex, endIndex);
+    }
+
+    private RangeValueNode ConsumeRangeValueNode()
+    {
+        var token = tokenizer.Consume();
+        return token.Type switch
+        {
+            TokenType.Number => new NumberRangeValueNode((NumberToken)token),
+            TokenType.Identifier => new IdentifierRangeValueNode(new IdentifierNode((IdentifierToken)token)),
+            _ => throw new ParserException("Unexpected value for range", token)
+        };
     }
 
     private TToken ConsumeExpectedToken<TToken>(string errorMessage)

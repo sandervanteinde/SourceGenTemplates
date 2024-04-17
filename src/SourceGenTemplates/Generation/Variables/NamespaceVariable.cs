@@ -10,6 +10,8 @@ public class NamespaceVariable(BaseNamespaceDeclarationSyntax @namespace)
         , IVariableWithStringRepresentation
 
 {
+    public BaseNamespaceDeclarationSyntax Namespace => @namespace;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return @namespace.Name.ToFullString();
@@ -28,5 +30,10 @@ public class NamespaceVariable(BaseNamespaceDeclarationSyntax @namespace)
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return @namespace.AttributeLists;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is NamespaceVariable namespaceVariable && namespaceVariable.Namespace == @namespace;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
@@ -120,8 +121,16 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         {
             BooleanExpressionType.Simple => IsSimpleBooleanExpressionTrue((SimpleComparisonBooleanExpressionNode)booleanExpressionNode),
             BooleanExpressionType.BooleanOperator => IsBooleanOperatorExpressionTrue((BooleanOperatorBooleanExpressionNode)booleanExpressionNode),
-            BooleanExpressionType.HasAttribute => IsAttributeExpressionTrue((HasAttributeBooleanExpressionNode)booleanExpressionNode)
+            BooleanExpressionType.HasAttribute => IsAttributeExpressionTrue((HasAttributeBooleanExpressionNode)booleanExpressionNode),
+            BooleanExpressionType.VariableComparison => IsVariableComparisonTrue((VariableComparisonBooleanExpressionNode)booleanExpressionNode)
         };
+    }
+
+    private bool IsVariableComparisonTrue(VariableComparisonBooleanExpressionNode variableComparisonBooleanExpressionNode)
+    {
+        var leftValue = _variables.GetOrThrow(variableComparisonBooleanExpressionNode.Left);
+        var rightValue = _variables.GetOrThrow(variableComparisonBooleanExpressionNode.Right);
+        return leftValue.IsEqualToVariable(rightValue);
     }
 
     private bool IsAttributeExpressionTrue(HasAttributeBooleanExpressionNode hasAttributeBooleanExpressionNode)
@@ -214,8 +223,8 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
 
     private bool GenerateForIDirectiveNode(ForINode node)
     {
-        var start = node.Range.StartRange.Number;
-        var end = node.Range.EndRange.Number;
+        var start = node.Range.StartRange.GetNumericValue(_variables);
+        var end = node.Range.EndRange.GetNumericValue(_variables);
 
         for (var i = start; i <= end; i++)
         {
@@ -234,7 +243,12 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         }
 
         var currentFileName = fileName;
-        var fileContents = SourceText.From(_sb.ToString(), Encoding.UTF8);
+
+        var syntaxTree = CSharpSyntaxTree.ParseText(_sb.ToString());
+        var root = syntaxTree.GetRoot();
+        var formatted = root.NormalizeWhitespace();
+
+        var fileContents = SourceText.From(formatted.ToFullString(), Encoding.UTF8);
         var attempt = 0;
 
         while (true)

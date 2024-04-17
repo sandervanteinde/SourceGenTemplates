@@ -9,6 +9,8 @@ public class IntegerVariable(int value)
     : Variable(VariableKind.Integer)
         , IVariableWithStringRepresentation
 {
+    public int Integer => value;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return value.ToString();
@@ -27,5 +29,10 @@ public class IntegerVariable(int value)
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return null;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is IntegerVariable integerVariable && integerVariable.Integer == value;
     }
 }

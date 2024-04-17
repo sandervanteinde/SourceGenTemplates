@@ -9,6 +9,8 @@ public class PropertyVariable(PropertyDeclarationSyntax property)
     : Variable(VariableKind.Property)
         , IVariableWithStringRepresentation
 {
+    public PropertyDeclarationSyntax Property => property;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return property.Identifier.ToString();
@@ -37,5 +39,10 @@ public class PropertyVariable(PropertyDeclarationSyntax property)
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return property.AttributeLists;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is PropertyVariable propertyVariable && propertyVariable.Property == property;
     }
 }

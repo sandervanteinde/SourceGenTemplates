@@ -11,6 +11,8 @@
         <None Remove="GenerateBuilders.cstempl"/>
         <AdditionalFiles Include="GenerateBuilders.cstempl"/>
         <None Remove="GenerateBuilder.cstempl"/>
+        <None Remove="GetAwaiter.cstempl"/>
+        <AdditionalFiles Include="GetAwaiter.cstempl"/>
     </ItemGroup>
 
     <ItemGroup>

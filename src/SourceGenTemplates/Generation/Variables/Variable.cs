@@ -20,6 +20,7 @@ public abstract class Variable(VariableKind kind)
     }
 
     protected abstract SyntaxList<AttributeListSyntax>? GetAttributes();
+    public abstract bool IsEqualToVariable(Variable rightValue);
 
     public Variable AccessProperty(IdentifierToken identifier)
     {

@@ -44,6 +44,7 @@ else_statement =
 
 boolean_expression = (variable_expression, "is", predefined_conditions)
     | (predefined_conditions, "is", variable_expression) 
+    | (variable expression, "is", variable_expression) 
     | (variable_expression, "has_attribute", string)
     | logical_operator.
 
@@ -57,7 +58,7 @@ or_operator = boolean_expression, "or", boolean_expression.
 and_operator = boolean_expression, "and", boolean_expression.
 not_operator = "not", boolean_expression.
 
-range = number, "..", number.
+range = (number | identifier), "..", (number | identifier).
 
 identifier = letter, { letter | number }.
 

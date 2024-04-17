@@ -8,9 +8,10 @@ Multiple boolean operations can be combined with the `not`, `or` and `and` keywo
 *_Brackets are currently not supported, the normal precedence of boolean operations is respected_
 
 ## Available keywords
-| Keyword                       | Filtering                                                                                                                                              |
-|-------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| is partial                    | Checks if the current variable has a C# partial keyword (can only return `true` for [class](../variable-types/class.md))                               |
-| is _[access modifier]_        | Uses any C# _access modifier_ (private / public / protected / internal) and checks if the current variable is defined in that scope                    |  
-| is readonly                   | Checks if the current variable has a C# readonly keyword.                                                                                              |
-| has_attribute "AttributeName" | Checks if the current variable has the attribute with the name defined between the double quotes.<br/>Note that this is a comparison on string level.  |
+| Keyword                       | Filtering                                                                                                                                             |
+|-------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| is partial                    | Checks if the current variable has a C# partial keyword (can only return `true` for [class](../variable-types/class.md))                              |
+| is _[access modifier]_        | Uses any C# _access modifier_ (private / public / protected / internal) and checks if the current variable is defined in that scope                   |  
+| is readonly                   | Checks if the current variable has a C# readonly keyword.                                                                                             |
+| is <other variable>           | Validates if the variables are equal to each-other                                                                                                    |
+| has_attribute "AttributeName" | Checks if the current variable has the attribute with the name defined between the double quotes.<br/>Note that this is a comparison on string level. |  

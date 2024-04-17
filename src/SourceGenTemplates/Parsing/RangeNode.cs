@@ -1,17 +1,16 @@
 ﻿using System.Text;
-using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Parsing;
 
-public class RangeNode(NumberToken startRange, NumberToken endRange) : Node
+public class RangeNode(RangeValueNode startRange, RangeValueNode endRange) : Node
 {
-    public NumberToken StartRange => startRange;
-    public NumberToken EndRange => endRange;
+    public RangeValueNode StartRange => startRange;
+    public RangeValueNode EndRange => endRange;
 
     protected internal override void AppendDebugString(StringBuilder sb)
     {
-        sb.Append(startRange.Number);
+        startRange.AppendDebugString(sb);
         sb.Append("..");
-        sb.Append(endRange.Number);
+        endRange.AppendDebugString(sb);
     }
 }

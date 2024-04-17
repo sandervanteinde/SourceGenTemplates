@@ -12,6 +12,8 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration)
     : Variable(VariableKind.Class),
         IVariableWithStringRepresentation
 {
+    public ClassDeclarationSyntax Class => classDeclaration;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return classDeclaration.Identifier.ToString();
@@ -43,6 +45,11 @@ public class ClassVariable(ClassDeclarationSyntax classDeclaration)
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return classDeclaration.AttributeLists;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is ClassVariable classVariable && classVariable.Class == classDeclaration;
     }
 
     private VariableCollection GetFields()

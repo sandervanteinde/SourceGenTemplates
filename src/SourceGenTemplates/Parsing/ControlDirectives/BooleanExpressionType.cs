@@ -4,5 +4,6 @@ public enum BooleanExpressionType
 {
     Simple,
     BooleanOperator,
-    HasAttribute
+    HasAttribute,
+    VariableComparison
 }

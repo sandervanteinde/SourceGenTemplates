@@ -7,6 +7,8 @@ namespace SourceGenTemplates.Generation.Variables;
 
 public class StringVariable(string value) : Variable(VariableKind.String), IVariableWithStringRepresentation
 {
+    public string String => value;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return value;
@@ -25,5 +27,10 @@ public class StringVariable(string value) : Variable(VariableKind.String), IVari
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return null;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is StringVariable stringVariable && stringVariable.String == value;
     }
 }

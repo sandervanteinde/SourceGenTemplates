@@ -17,14 +17,29 @@ Any [boolean expression](./boolean-expressions.md) can be used inside the if-sta
 ## For range directive
 The `for range` directive is a directive that allows you to iterate over a range of integers.
 
+You can provide either a number or a variable which contains an integer as one of the ranges
+
 The syntax for a `for range` is:
 ```
-::for var i in 1..10;
-  // Your code here
+::for var i in 1..3;
+    ::for var j in 1..i;
+        // Do something with i and j    
+    ::end;
 ::end;
 ```
 
 In this case `i` is a variable and `1..10` is a range that you can define yourself. This can be a range from any positive number to a higher positive number.
+`j' in this example is dynamicly based on i. This loop will iterate over the following values
+
+| i   | j   |
+|-----|-----|
+| 1   | 1   |
+| 2   | 1   |
+| 2   | 2   |
+| 3   | 1   |
+| 3   | 2   |
+| 3   | 3   |
+
 
 ## Foreach directive
 

@@ -9,6 +9,8 @@ public class TypeVariable(TypeSyntax typeDeclarationSyntax)
     : Variable(VariableKind.Type)
         , IVariableWithStringRepresentation
 {
+    public TypeSyntax TypeSyntax => typeDeclarationSyntax;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         var model = compilationContext.GetSemanticModel(typeDeclarationSyntax.SyntaxTree);
@@ -31,5 +33,10 @@ public class TypeVariable(TypeSyntax typeDeclarationSyntax)
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return null;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is TypeVariable typeVariable && typeVariable.TypeSyntax == typeDeclarationSyntax;
     }
 }

@@ -10,6 +10,8 @@ public class FieldVariable(FieldDeclarationSyntax fieldDeclaration)
     : Variable(VariableKind.Field)
         , IVariableWithStringRepresentation
 {
+    public FieldDeclarationSyntax Field => fieldDeclaration;
+
     public string GetCodeRepresentation(CompilationContext compilationContext)
     {
         return fieldDeclaration.Declaration
@@ -41,5 +43,10 @@ public class FieldVariable(FieldDeclarationSyntax fieldDeclaration)
     protected override SyntaxList<AttributeListSyntax>? GetAttributes()
     {
         return fieldDeclaration.AttributeLists;
+    }
+
+    public override bool IsEqualToVariable(Variable rightValue)
+    {
+        return rightValue is FieldVariable field && field.Field == fieldDeclaration;
     }
 }

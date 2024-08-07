@@ -6,32 +6,32 @@ It then scans the class for all private fields which are not `readonly` and gene
 
 ## Template
 ```csharp
-::foreach var classRef in class
-  where classRef is partial and classRef has_attribute "GenerateBuilder";
-::filename classRef;
+{{#foreach var classRef in class
+  where classRef is partial and classRef has_attribute "GenerateBuilder"}}
+{{#filename classRef}}
 using System;
 
-namespace ::classRef.Namespace::;
+namespace {{classRef.Namespace}};
 
-partial class ::classRef::
+partial class {{classRef}}
 {
 
-    ::foreach var field in classRef.Fields
-            where not field is readonly and field is private;
-    public ::classRef:: With::field to pascalcase::(::field.Type:: ::field to camelcase to escape_keywords::)
+    {{#foreach var field in classRef.Fields
+            where not field is readonly and field is private}}
+    public {{classRef}} With{{field to pascalcase}}({{field.Type}} {{field to camelcase to escape_keywords}})
     {
-        ::field:: = ::field to camelcase to escape_keywords::;
+        {{field}} = {{field to camelcase to escape_keywords}};
         return this;
     }
     
-    public ::classRef:: Without::field to pascalcase::()
+    public {{classRef}} Without{{field to pascalcase}}()
     {
-        ::field:: = default(::field.Type::);
+        {{field}} = default({{field.Type}});
         return this;
     }
-    ::end;
+    {{/foreach}}
 }
-::end;
+{{/foreach}}
 ```
 
 ## Example class

@@ -26,9 +26,9 @@ public class HelloWorld
 {
     public void SayHelloThreeTimes()
     {
-        ::for var i in 1..3;
-        Console.WriteLine("Hello ::i::");
-        ::end;
+        {{#for var i in 1..3}}
+        Console.WriteLine("Hello {{i}}");
+        {{/for}}
     }    
 }
 ```

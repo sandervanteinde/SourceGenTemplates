@@ -7,36 +7,39 @@ the [EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form) form
 file = { block }.
 
 block =
-      csharp 
-    | (context_switch, directive) 
-    | (context_switch, variable_expression, context_switch).
+      csharp
+    | template_block.
 
 csharp = ? any valid C# which is not parsed by the grammer and interpreted as is ?
 
-directive = filename | for_i | foreach | if_statement.
+template_block = template_instruction | ("{{", expression, "}}").
 
-filename = "filename", " ", expression, context_termination.
+template_instruction = single_line_instruction | multi_line_instruction.
 
-expression = identifier | string | number.
+single_line_instruction = filename.
+multi_line_instruction = for_i | foreach | if_statement.
+
+filename = "{{#filename", " ", expression, "}}".
+
+expression = variable_expression | string | number.
 
 string = """, { character } , """. (* A string with double quotes, e.g. "text" *)
 
 number = digit, { digit }.
 
-for_i = "for", "var", identifier, "in", range, context_termination, 
+for_i = "{{#for", "var", identifier, "in", range, "}}", 
     block, { block },
-    context_switch, "end", context_termination.
+    "{{/for}}".
 
-foreach = "foreach", "var", identifier, "in", foreach_target, 
-    [ "where", boolean_expression ],
-    context_termination, 
+foreach = "{{#foreach", "var", identifier, "in", foreach_target, 
+    [ "where", boolean_expression ], "}}", 
     block, { block },
-    context_switch, "end", context_termination.
+    "{{/foreach}}".
     
-if_statement = "if", boolean_expression, context_termination,
+if_statement = "{{#if", boolean_expression, context_termination, "}}" 
     { block },
     [ else_statement ]
-    context_switch, "end", context_termination.
+    "{{/if}}".
 
 else_statement = 
     ( "else", context_termination, { block } )
@@ -75,5 +78,5 @@ context_switch = "::".
 
 access_modifier: "public" | "private" | "protected" | "internal" | ("protected", "internal") | ("internal", "protected"), ("private", "protected") | ("protected", "private")
 
-context_termination = ";".
+context_termination = "}}".
 ```

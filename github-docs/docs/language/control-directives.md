@@ -6,9 +6,9 @@ As with all programming languages, you can control your template with if stateme
 
 The syntax for a `If directive` is:
 ```csharp
-::if variable is condition;
+{{#if variable is condition}}
 
-::endif;
+{{/if}}
 ```
 
 Any [boolean expression](./boolean-expressions.md) can be used inside the if-statement
@@ -21,11 +21,11 @@ You can provide either a number or a variable which contains an integer as one o
 
 The syntax for a `for range` is:
 ```
-::for var i in 1..3;
-    ::for var j in 1..i;
-        // Do something with i and j    
-    ::end;
-::end;
+{{#for var i in 1..3}}
+    {{#for var j in 1..i}}
+        Console.WriteLine("The value of i is {{i}} and the value of j is {{j}}");
+    {{/for}}
+{{/for}}
 ```
 
 In this case `i` is a variable and `1..10` is a range that you can define yourself. This can be a range from any positive number to a higher positive number.
@@ -47,9 +47,9 @@ The `foreach` directive is similar to how a `foreach` in C# works. It iterates o
 
 The basic syntax for a `foreach` is:
 ```
-::foreach var item in collection;
+{{#foreach var item in collection}}
     // Your code here
-::end;
+{{/foreach}}
 ```
 
 Where `collection` can be any variable which contains multiple items
@@ -59,10 +59,9 @@ Where `collection` can be any variable which contains multiple items
 The `class` keyword is a keyword in the templating engine that contains all classes in your current assembly. This can be used as something to iterate over in the templating engine:
 
 ```csharp
-::foreach var classRef in class;
+{{#foreach var classRef in class}}
   // Your code for each class
-::end;
-
+{{/foreach}}
 ```
 
 ### The where clause
@@ -74,10 +73,10 @@ Note how the syntax of the where is a [boolean expression](./boolean-expressions
 Anything that an if-statement supports is also supported in a where clause.
 
 ```csharp
-::foreach var classRef in class
-    where classRef is partial;
+{{#foreach var classRef in class
+    where classRef is partial}}
     // Your code her
-::end;
+{{/end}}
 ```
 
 ## Filename directive
@@ -93,17 +92,17 @@ Using this directive is merely controlling the output for debugging purposes. If
 
 For example, giving that your assembly has two classes called `A` and `B`, then the following template generated the output below.
 ```csharp
-::foreach var classRef in class;
-    ::filename classRef;
+{{#foreach var classRef in class}}
+    {{#filename classRef}}
     using System;
 
     namespace SourceGenerators;
 
-    public class HelloFrom::classRef:: 
+    public class HelloFrom{{classRef}} 
     {
         public static void HelloFromTemplates()
         {
-            Console.WriteLine("::classRef:: was generated in a template!");
+            Console.WriteLine("{{classRef}} was generated in a template!");
         }
     }
 ::end;

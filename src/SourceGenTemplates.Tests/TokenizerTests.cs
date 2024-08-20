@@ -10,8 +10,12 @@ public class TokenizerTests
     {
         // ARRANGE
         var code = """
-                   ::foreach var c in class
-                       where partial;
+                   {{#foreach var c in class where partial}}
+                   partial class {{c}} 
+                   {
+                      public void Dummy() {} 
+                   }
+                   {{/foreach}}
                    """;
 
         // ACT
@@ -21,7 +25,8 @@ public class TokenizerTests
         ConsumeAll(tokenizer)
             .Should()
             .SatisfyRespectively(
-                TokenType<CodeContextToken>(),
+                TokenType<StartCodeContextToken>(),
+                TokenType<StartDirectiveToken>(),
                 TokenType<ForeachToken>(),
                 TokenType<VarToken>(),
                 TokenType<IdentifierToken>(
@@ -32,69 +37,23 @@ public class TokenizerTests
                 TokenType<ClassToken>(),
                 TokenType<WhereToken>(),
                 TokenType<PartialToken>(),
-                TokenType<CodeContextEndToken>()
-            );
-    }
-
-    [Fact]
-    public void SemicolonAfterCodeContextInsertion()
-    {
-        // ARRANGE
-        var code = "::c.Namespace::;";
-
-        // ACT
-        var tokenizer = new Tokenizer(code);
-
-        // ASSERT
-        ConsumeAll(tokenizer)
-            .Should()
-            .SatisfyRespectively(
-                TokenType<CodeContextToken>(),
+                TokenType<EndCodeContextToken>(),
+                TokenType<SourceTextToken>(),
+                TokenType<StartCodeContextToken>(),
                 TokenType<IdentifierToken>(
                     c => c.Identifier.Should()
                         .Be("c")
                 ),
-                TokenType<DotToken>(),
-                TokenType<IdentifierToken>(
-                    c => c.Identifier.Should()
-                        .Be("Namespace")
-                ),
-                TokenType<CodeContextToken>(),
-                TokenType<SourceTextToken>(
-                    c => c.SourceText.Should()
-                        .Be(";")
-                )
+                TokenType<EndCodeContextToken>(),
+                TokenType<SourceTextToken>(),
+                TokenType<StartCodeContextToken>(),
+                TokenType<EndDirectiveToken>(),
+                TokenType<ForeachToken>(),
+                TokenType<EndCodeContextToken>()
             );
     }
 
-    [Fact]
-    public void PropertyAccessor()
-    {
-        // ARRANGE
-        var code = "::c.Namespace::";
-
-        // ACT
-        var tokenizer = new Tokenizer(code);
-
-        // ASSERT
-        ConsumeAll(tokenizer)
-            .Should()
-            .SatisfyRespectively(
-                TokenType<CodeContextToken>(),
-                TokenType<IdentifierToken>(
-                    c => c.Identifier.Should()
-                        .Be("c")
-                ),
-                TokenType<DotToken>(),
-                TokenType<IdentifierToken>(
-                    c => c.Identifier.Should()
-                        .Be("Namespace")
-                ),
-                TokenType<CodeContextToken>()
-            );
-    }
-
-    private Action<Token> TokenType<TExpected>(Action<TExpected>? additionalChecks = null)
+    private static Action<Token> TokenType<TExpected>(Action<TExpected>? additionalChecks = null)
         where TExpected : Token
     {
         return token =>
@@ -107,8 +66,9 @@ public class TokenizerTests
         };
     }
 
-    private List<Token> ConsumeAll(Tokenizer tokenizer)
+    private static IEnumerable<Token> ConsumeAll(Tokenizer tokenizer)
     {
+        tokenizer.Tokenize();
         var tokens = new List<Token>();
 
         while (tokenizer.TryPeek(out _))

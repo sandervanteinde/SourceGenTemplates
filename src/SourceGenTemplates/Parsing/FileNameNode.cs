@@ -9,7 +9,8 @@ public class FileNameNode(ExpressionNode expression) : Node
 
     protected internal override void AppendDebugString(StringBuilder sb)
     {
-        sb.Append("Filename ");
+        sb.Append("{{#filename ");
         expression.AppendDebugString(sb);
+        sb.AppendLine("}}");
     }
 }

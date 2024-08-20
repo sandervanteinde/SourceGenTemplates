@@ -3,7 +3,8 @@
   "profiles": {
     "DebugRoslynSourceGenerator": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "../SourceGenTemplates.Sample/SourceGenTemplates.Sample.csproj"
+      "targetProject": "../SourceGenTemplates.Sample/SourceGenTemplates.Sample.csproj",
+      "dotnetRunMessages": true
     }
   }
 }

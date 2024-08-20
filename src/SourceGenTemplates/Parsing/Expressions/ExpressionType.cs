@@ -2,7 +2,7 @@
 
 public enum ExpressionType
 {
-    Identifier,
     String,
-    Number
+    Number,
+    VariableExpression
 }

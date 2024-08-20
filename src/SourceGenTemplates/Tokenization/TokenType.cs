@@ -6,12 +6,11 @@ public enum TokenType
     FileNameDirective,
     Identifier,
     For,
-    End,
     Number,
     DoubleDot,
     In,
-    CodeContextSwitch,
-    CodeContextEnd,
+    StartCodeContext,
+    EndCodeContext,
     Class,
     Foreach,
     String,
@@ -34,5 +33,7 @@ public enum TokenType
     PascalCase,
     CamelCase,
     EscapeKeyword,
-    HasAttribute
+    HasAttribute,
+    EndDirective,
+    StartDirective
 }

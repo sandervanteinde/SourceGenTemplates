@@ -8,10 +8,11 @@ using SourceGenTemplates.Generation.Variables;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;
 using SourceGenTemplates.Parsing.ControlDirectives;
-using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.LogicalOperators;
+using SourceGenTemplates.Parsing.TemplateBlocks;
+using SourceGenTemplates.Parsing.TemplateInstructions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation;
@@ -40,8 +41,7 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         _ = block.Type switch
         {
             BlockNodeType.CSharp => GenerateSourceText((CSharpBlockNode)block),
-            BlockNodeType.Directive => GenerateDirectiveBlockNode(((DirectiveBlockNode)block).Directive),
-            BlockNodeType.VariableInsertion => GenerateDirectiveBlockNode((VariableInsertionBlockNode)block)
+            BlockNodeType.Template => GenerateTemplateBlockNode(((TemplateBlockBlockNode)block).TemplateBlockNode)
         };
     }
 
@@ -51,28 +51,30 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
         return true;
     }
 
-    private bool GenerateDirectiveBlockNode(VariableInsertionBlockNode node)
+    private bool GenerateExpression(ExpressionNode expression)
     {
-        var value = _variables.GetOrThrow(node.VariableExpression);
-
-        if (value is not IVariableWithStringRepresentation variableWithStringRepresentation)
-        {
-            throw new ParserException("Value could not be represented as a string", node.VariableExpression.Token);
-        }
-
-        _sb.Append(variableWithStringRepresentation.GetCodeRepresentation(compilationContext));
+        var sourceText = ParseExpressionToSourceText(expression);
+        _sb.Append(sourceText);
         return true;
     }
 
-    private bool GenerateDirectiveBlockNode(DirectiveNode directive)
+    private bool GenerateTemplateBlockNode(TemplateBlockNode templateBlockNode)
+    {
+        return templateBlockNode.Type switch
+        {
+            TemplateBlockNodeType.Instruction => GenerateTemplateInstructionNode(((TemplateInstructionBlockNode)templateBlockNode).TemplateInstruction),
+            TemplateBlockNodeType.Expression => GenerateExpression(((TemplateExpressionBlockNode)templateBlockNode).Expression)
+        };
+    }
+
+    private bool GenerateTemplateInstructionNode(TemplateInstructionNode directive)
     {
         return directive.Type switch
         {
-            DirectiveNodeType.Filename => GenerateFileNameDirectiveNode(((FileNameDirectiveNode)directive).FileName),
-            DirectiveNodeType.ForI => GenerateForIDirectiveNode(((ForIDirectiveNode)directive).ForINode),
-            DirectiveNodeType.Foreach => GenerateForeachDirectiveNode(((ForeachDirectiveNode)directive).ForeachNode),
-            DirectiveNodeType.If => GenerateIfDirectiveNode(((IfDirectiveNode)directive).If),
-            _ => throw new ArgumentOutOfRangeException()
+            TemplateInstructionNodeType.Filename => GenerateFileNameDirectiveNode(((FilenameTemplateInstructionNode)directive).FileName),
+            TemplateInstructionNodeType.ForI => GenerateForIDirectiveNode(((ForITemplateInstructionNode)directive).ForINode),
+            TemplateInstructionNodeType.Foreach => GenerateForeachDirectiveNode(((ForeachTemplateInstructionNode)directive).ForeachNode),
+            TemplateInstructionNodeType.If => GenerateIfDirectiveNode(((IfTemplateInstructionNode)directive).If)
         };
     }
 
@@ -174,25 +176,20 @@ public class Generator(string fileName, FileNode file, GeneratorExecutionContext
     private bool GenerateFileNameDirectiveNode(FileNameNode node)
     {
         OutputCurrentContentsToFile();
-        fileName = node.Expression.Type switch
-        {
-            ExpressionType.Identifier => GetStringValueOfVariableExpression(((IdentifierExpressionNode)node.Expression).Identifier),
-            ExpressionType.String => ((StringExpressionNode)node.Expression).Value.Value,
-            ExpressionType.Number => throw new ParserException("Numbers are not valid file names", node.Expression.Token)
-        };
+        fileName = ParseExpressionToSourceText(node.Expression);
         return true;
     }
 
-    private string GetStringValueOfVariableExpression(IdentifierToken identifier)
+    private string ParseExpressionToSourceText(ExpressionNode expression)
     {
-        var variable = _variables.GetOrThrow(identifier);
-
-        if (variable is not IVariableWithStringRepresentation variableWithStringRepresentation)
+        return expression.Type switch
         {
-            throw new ParserException("Value could not be represented as a string", identifier);
-        }
-
-        return variableWithStringRepresentation.GetCodeRepresentation(compilationContext);
+            ExpressionType.VariableExpression => _variables.GetOrThrow(((VariableExpressionExpressionNode)expression).VariableExpression) is IVariableWithStringRepresentation variableWithStringRepresentation
+                ? variableWithStringRepresentation.GetCodeRepresentation(compilationContext)
+                : throw new ParserException("Value could not be represented as a string", ((VariableExpressionExpressionNode)expression).VariableExpression.Token),
+            ExpressionType.String => ((StringExpressionNode)expression).Value.Value,
+            ExpressionType.Number => throw new ParserException("Numbers are not valid file names", expression.Token)
+        };
     }
 
     private bool GenerateForeachDirectiveNode(ForeachNode node)

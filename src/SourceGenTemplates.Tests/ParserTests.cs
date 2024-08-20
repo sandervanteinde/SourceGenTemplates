@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using SourceGenTemplates.Parsing;
 using SourceGenTemplates.Parsing.BlockNodes;
-using SourceGenTemplates.Parsing.Directives;
+using SourceGenTemplates.Parsing.TemplateBlocks;
+using SourceGenTemplates.Parsing.TemplateInstructions;
 using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Tests;
@@ -13,9 +14,9 @@ public class ParserTests
     {
         // ARRANGE
         var code = """
-                   ::foreach var c in class
-                       where c is partial;
-                   ::end;
+                   {{#foreach var c in class
+                       where c is partial}}
+                   {{/foreach}}
                    """;
         var tokenizer = new Tokenizer(code);
         var generator = new Parser(tokenizer);
@@ -28,10 +29,14 @@ public class ParserTests
             .ContainSingle()
             .Which
             .Should()
-            .BeOfType<DirectiveBlockNode>()
+            .BeOfType<TemplateBlockBlockNode>()
             .Which
-            .Directive
+            .TemplateBlockNode
             .Should()
-            .BeOfType<ForeachDirectiveNode>();
+            .BeOfType<TemplateInstructionBlockNode>()
+            .Which
+            .TemplateInstruction
+            .Should()
+            .BeOfType<ForeachTemplateInstructionNode>();
     }
 }

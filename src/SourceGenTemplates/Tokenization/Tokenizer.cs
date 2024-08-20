@@ -6,16 +6,24 @@ namespace SourceGenTemplates.Tokenization;
 
 public class Tokenizer(string sourceText)
 {
-    private readonly List<Token> _tokens = Parse(sourceText);
+    private readonly List<Token> _tokens = [];
 
     private int _index;
     public Token Last => _tokens[_tokens.Count - 1];
 
     public bool HasMore => _index < _tokens.Count;
 
+    public void Tokenize()
+    {
+        if (_tokens.Count == 0)
+        {
+            _tokens.AddRange(Parse(sourceText));
+        }
+    }
+
     public bool TryPeek(out Token? token)
     {
-        return TryPeek(0, out token);
+        return TryPeek(offset: 0, out token);
     }
 
     public bool ConsumeIfNextIsOfType(TokenType type)
@@ -77,7 +85,7 @@ public class Tokenizer(string sourceText)
     {
         if (--_index < 0)
         {
-            throw new ParserException("Attempted to rewind tokens to before the start of the file", _tokens[0]);
+            throw new ParserException("Attempted to rewind tokens to before the start of the file", _tokens[index: 0]);
         }
     }
 
@@ -89,48 +97,45 @@ public class Tokenizer(string sourceText)
         }
     }
 
-    private static List<Token> Parse(string sourceText)
+    private static IEnumerable<Token> Parse(string sourceText)
     {
         var text = sourceText;
         var inCodeContext = false;
         var index = 0;
         var lineNumber = 0;
         var column = 0;
-        var list = new List<Token>();
 
         do
         {
             if (TryHandleContextSwitch(out var contextSwitchToken))
             {
-                list.Add(contextSwitchToken!);
+                yield return contextSwitchToken!;
             }
             else if (inCodeContext)
             {
-                list.Add(HandleCodeContext());
+                yield return HandleCodeContext();
             }
             else
             {
                 if (HandleNonCodeContext(out var token))
                 {
-                    list.Add(token!);
+                    yield return token!;
                 }
             }
         } while (index < text.Length);
-
-        return list;
 
         Token HandleCodeContext()
         {
             var span = text.AsSpan()
                 .Slice(index);
 
-            while (char.IsWhiteSpace(span[0]))
+            while (char.IsWhiteSpace(span[index: 0]))
             {
                 BumpIndex();
-                span = span.Slice(1);
+                span = span.Slice(start: 1);
             }
 
-            var currentChar = span[0];
+            var currentChar = span[index: 0];
             var endIndex = 0;
 
             if (char.IsDigit(currentChar))
@@ -141,29 +146,29 @@ public class Tokenizer(string sourceText)
                 }
 
                 var number = int.Parse(
-                    span.Slice(0, endIndex)
+                    span.Slice(start: 0, endIndex)
                         .ToString()
                 );
                 var position = BumpBy(endIndex);
                 return new NumberToken(position, number);
             }
 
-            if (currentChar == '.' && span.Length > 2 && span[1] == '.')
+            if (currentChar == '.' && span.Length > 2 && span[index: 1] == '.')
             {
-                var location = BumpBy(2);
+                var location = BumpBy(count: 2);
                 return new DoubleDotToken(location);
             }
 
             if (currentChar == '.')
             {
-                return new DotToken(BumpBy(1));
+                return new DotToken(BumpBy(count: 1));
             }
 
             if (currentChar == '"')
             {
                 var nextIndex = span
-                    .Slice(1)
-                    .IndexOfAny('"', '\n', '\r');
+                    .Slice(start: 1)
+                    .IndexOfAny(value0: '"', value1: '\n', value2: '\r');
 
                 if (nextIndex == -1 || span[nextIndex + 1] is not '"')
                 {
@@ -173,10 +178,20 @@ public class Tokenizer(string sourceText)
 
                 var location = BumpBy(nextIndex + 2);
                 var stringToken = new StringToken(
-                    location, span.Slice(1, nextIndex)
+                    location, span.Slice(start: 1, nextIndex)
                         .ToString()
                 );
                 return stringToken;
+            }
+
+            if (currentChar == '/')
+            {
+                return new EndDirectiveToken(BumpBy(count: 1));
+            }
+
+            if (currentChar == '#')
+            {
+                return new StartDirectiveToken(BumpBy(count: 1));
             }
 
             if (!char.IsLetter(currentChar))
@@ -192,7 +207,7 @@ public class Tokenizer(string sourceText)
                 endIndex++;
             }
 
-            var word = span.Slice(0, endIndex)
+            var word = span.Slice(start: 0, endIndex)
                 .ToString();
 
             var namePosition = BumpBy(endIndex);
@@ -201,7 +216,6 @@ public class Tokenizer(string sourceText)
             {
                 "filename" => new FileNameToken(namePosition),
                 "for" => new ForToken(namePosition),
-                "end" => new EndToken(namePosition),
                 "var" => new VarToken(namePosition),
                 "in" => new InToken(namePosition),
                 "foreach" => new ForeachToken(namePosition),
@@ -232,11 +246,14 @@ public class Tokenizer(string sourceText)
         {
             var span = text.AsSpan(index);
             var textLength = 0;
+            Span<char> startSequence = stackalloc char[2];
+            startSequence[index: 0] = '{';
+            startSequence[index: 1] = '{';
 
-            while (!span.IsEmpty && (span.Length < 2 || span[0] != ':' || span[1] != ':'))
+            while (!span.StartsWith(startSequence) && !span.IsEmpty)
             {
                 textLength++;
-                span = span.Slice(1);
+                span = span.Slice(start: 1);
             }
 
             if (textLength > 0)
@@ -267,26 +284,26 @@ public class Tokenizer(string sourceText)
 
             if (inCodeContext)
             {
-                while (char.IsWhiteSpace(span[0]))
+                while (char.IsWhiteSpace(span[index: 0]))
                 {
                     incrementIndex++;
-                    span = span.Slice(1);
+                    span = span.Slice(start: 1);
                 }
 
-                if (span[0] == ';')
+                if (span.StartsWith(['}', '}']))
                 {
-                    var position = BumpBy(1 + incrementIndex);
-                    token = new CodeContextEndToken(position);
+                    var position = BumpBy(2 + incrementIndex);
+                    token = new EndCodeContextToken(position);
                     inCodeContext = false;
                     span = text.AsSpan()
                         .Slice(index);
 
                     var increment = 0;
 
-                    while (!span.IsEmpty && span[0] is '\r' or '\n')
+                    while (!span.IsEmpty && span[index: 0] is '\r' or '\n')
                     {
                         increment++;
-                        span = span.Slice(1);
+                        span = span.Slice(start: 1);
                     }
 
                     if (increment > 0)
@@ -304,11 +321,19 @@ public class Tokenizer(string sourceText)
                 return false;
             }
 
-            if (span[0] == ':' && span[1] == ':')
+            if (span.StartsWith(['{', '{']))
             {
                 var position = BumpBy(2 + incrementIndex);
-                inCodeContext = !inCodeContext;
-                token = new CodeContextToken(position);
+                inCodeContext = true;
+                token = new StartCodeContextToken(position);
+                return true;
+            }
+
+            if (span.StartsWith(['}', '}']))
+            {
+                var position = BumpBy(2 + incrementIndex);
+                inCodeContext = false;
+                token = new EndCodeContextToken(position);
                 return true;
             }
 

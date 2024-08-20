@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using SourceGenTemplates.Parsing.BlockNodes;
 using SourceGenTemplates.Parsing.ControlDirectives;
-using SourceGenTemplates.Parsing.Directives;
 using SourceGenTemplates.Parsing.Expressions;
 using SourceGenTemplates.Parsing.Foreach;
 using SourceGenTemplates.Parsing.Foreach.Conditions;
 using SourceGenTemplates.Parsing.LogicalOperators;
 using SourceGenTemplates.Parsing.Mutators;
+using SourceGenTemplates.Parsing.TemplateBlocks;
+using SourceGenTemplates.Parsing.TemplateInstructions;
 using SourceGenTemplates.Parsing.VariableExpressions;
 using SourceGenTemplates.Tokenization;
 
@@ -17,8 +18,8 @@ public class Parser(Tokenizer tokenizer)
 {
     public FileNode ParseFileNode()
     {
-        var blocks = ParseBlocks();
-        return new FileNode(blocks);
+        tokenizer.Tokenize();
+        return new FileNode(ParseBlocks());
     }
 
     private IReadOnlyCollection<BlockNode> ParseBlocks()
@@ -33,41 +34,35 @@ public class Parser(Tokenizer tokenizer)
                 continue;
             }
 
-            if (TryParseVariableInsertion(out var variableInsertion))
+            if (TryParseTemplateBlock(out var templateBlockNode))
             {
-                result.Add(variableInsertion!);
+                result.Add(new TemplateBlockBlockNode(templateBlockNode));
                 continue;
             }
 
-            if (!TryParseDirective(out var directiveToken))
-            {
-                return result;
-            }
-
-            result.Add(new DirectiveBlockNode(directiveToken));
+            break;
         }
 
         return result;
     }
 
-    private bool TryParseVariableInsertion(out VariableInsertionBlockNode? node)
+    private bool TryParseTemplateBlock(out TemplateBlockNode templateBlockNode)
     {
-        node = null;
-
-        if (!tokenizer.ConsumeIfNextIsOfType(TokenType.CodeContextSwitch))
+        if (TryParseTemplateInstruction(out var templateInstructionNode))
         {
-            return false;
+            templateBlockNode = new TemplateInstructionBlockNode(templateInstructionNode);
+            return true;
         }
 
-        if (!TryParseVariableExpression(out var variableExpressionNode))
+        if (TryParseExpression(out var expression))
         {
-            tokenizer.Return();
-            return false;
+
+            templateBlockNode = new TemplateExpressionBlockNode(expression);
+            return true;
         }
 
-        node = new VariableInsertionBlockNode(variableExpressionNode!);
-        _ = ConsumeExpectedToken<CodeContextToken>("Expected variable insertion to end with ::");
-        return true;
+        templateBlockNode = null!;
+        return false;
     }
 
     private bool TryParseVariableExpression(out VariableExpressionNode? variableExpressionNode)
@@ -132,104 +127,122 @@ public class Parser(Tokenizer tokenizer)
         return new ForeachTargetClass(ConsumeExpectedToken<ClassToken>("Expected variable expression or \"class\" as foreach target"));
     }
 
-    private bool TryParseDirective(out DirectiveNode directiveNode)
+    private bool TryParseTemplateInstruction(out TemplateInstructionNode templateInstructionNode)
     {
-        if (!tokenizer.TryPeek(1, out var token))
+        Token? secondToken = null;
+        Token? token = null;
+        var hasTokens = tokenizer.TryPeek(out var firstToken)
+            && tokenizer.TryPeek(offset: 1, out secondToken)
+            && tokenizer.TryPeek(offset: 2, out token);
+
+        if (!hasTokens || firstToken!.Type != TokenType.StartCodeContext || secondToken!.Type != TokenType.StartDirective)
         {
-            directiveNode = null!;
+            templateInstructionNode = null!;
             return false;
         }
 
         if (token is FileNameToken)
         {
-            tokenizer.Consume(2);
+            tokenizer.Consume(amount: 3);
             var expression = ParseExpression();
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected for statement to end with ;");
+            ConsumeExpectedToken(TokenType.EndCodeContext, "Expected filename statement to end with }}");
             FileNameNode fileNameNode = new(expression);
-            directiveNode = new FileNameDirectiveNode(fileNameNode);
-
+            templateInstructionNode = new FilenameTemplateInstructionNode(fileNameNode);
             return true;
         }
 
         if (token is ForToken)
         {
-            tokenizer.Consume(2);
-            _ = ConsumeExpectedToken<VarToken>("Expected 'var' to be followed by 'for'");
+            tokenizer.Consume(amount: 3);
+            ConsumeExpectedToken(TokenType.Var, "Expected 'for' to be followed by 'var'");
             var identifier = ParseIdentifierNode();
-            _ = ConsumeExpectedToken<InToken>("Expected 'in' to be followed by identifier in 'for' statement");
+            ConsumeExpectedToken(TokenType.In, "Expected identifier to be followed by 'in' statement");
             var rangeToken = ParseRangeNode();
-            ConsumeExpectedToken<CodeContextEndToken>("Expected for statement to end with ;");
+            ConsumeExpectedToken(TokenType.EndCodeContext, "Expected for statement to end with }}");
 
             var blocks = ParseBlocks();
-            _ = ConsumeExpectedToken<CodeContextToken>("Expected for loop to be closed with an end statement");
-            _ = ConsumeExpectedToken<EndToken>("Expected for loop to be closed with a end statement");
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
+            const string expectedEndStatement = "Expected for loop to end with {{/for}}";
+            ConsumeExpectedToken(TokenType.StartCodeContext, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.EndDirective, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.For, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.EndCodeContext, expectedEndStatement);
             ForINode forInode = new(blocks, rangeToken, identifier);
-            directiveNode = new ForIDirectiveNode(forInode);
+            templateInstructionNode = new ForITemplateInstructionNode(forInode);
             return true;
         }
 
         if (token is ForeachToken)
         {
-            tokenizer.Consume(2);
-            ConsumeExpectedToken<VarToken>("Expected 'var' to be followed by 'foreach'");
+            tokenizer.Consume(amount: 3);
+            ConsumeExpectedToken(TokenType.Var, "Expected 'var' to be followed by 'for'");
             var identifierNode = ParseIdentifierNode();
-            ConsumeExpectedToken<InToken>("Expected 'in' to be followed by an identifier in a 'foreach'");
+
+            ConsumeExpectedToken(TokenType.In, "Expected 'in' to be followed by an identifier in a 'foreach'");
             var foreachTarget = ParseForeachTarget();
             var conditionNode = tokenizer.ConsumeIfNextIsOfType(TokenType.Where)
                 ? ParseBooleanExpressionNode()
                 : null;
-
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
+            ConsumeExpectedToken(TokenType.EndCodeContext, "Expected foreach statement to end with }}");
 
             var blocks = ParseBlocks();
-            _ = ConsumeExpectedToken<CodeContextToken>("Expected ::end");
-            _ = ConsumeExpectedToken<EndToken>("Expected ::end");
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
+
+            const string expectedEndStatement = "Expected foreach loop to end with {{/foreach}}";
+            ConsumeExpectedToken(TokenType.StartCodeContext, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.EndDirective, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.Foreach, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.EndCodeContext, expectedEndStatement);
             var foreachNode = new ForeachNode(foreachTarget, identifierNode, blocks, conditionNode);
-            directiveNode = new ForeachDirectiveNode(foreachNode);
+            templateInstructionNode = new ForeachTemplateInstructionNode(foreachNode);
             return true;
         }
 
         if (token is IfToken)
         {
-            tokenizer.Consume(2);
+            tokenizer.Consume(amount: 3);
             var booleanExpressionNode = ParseBooleanExpressionNode();
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected if statement to be terminated with a ;");
+            ConsumeExpectedToken(TokenType.EndCodeContext, "Expected if statement to be terminated with }}");
             var blocks = ParseBlocks();
             var elseExpression = TryParseElseExpressionNode();
-            _ = ConsumeExpectedToken<CodeContextToken>("Expected ::end");
-            _ = ConsumeExpectedToken<EndToken>("Expected ::end");
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected end statement to end with ;");
+
+            const string expectedEndStatement = "Expected foreach loop to end with {{/if}}";
+            ConsumeExpectedToken(TokenType.StartCodeContext, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.EndDirective, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.If, expectedEndStatement);
+            ConsumeExpectedToken(TokenType.EndCodeContext, expectedEndStatement);
             var ifNode = new IfNode(booleanExpressionNode, blocks, elseExpression);
-            directiveNode = new IfDirectiveNode(ifNode);
+            templateInstructionNode = new IfTemplateInstructionNode(ifNode);
             return true;
         }
 
-        directiveNode = null!;
+        templateInstructionNode = null!;
         return false;
     }
 
     private ElseExpressionNode? TryParseElseExpressionNode()
     {
-        if (!tokenizer.TryPeek(out var possibleCodeContextSwitch) || possibleCodeContextSwitch!.Type != TokenType.CodeContextSwitch
-            || !tokenizer.TryPeek(1, out var afterCodeContext) || afterCodeContext!.Type is not TokenType.Else)
+        Token? secondToken = null;
+        Token? thirdToken = null;
+        var hasTokens = tokenizer.TryPeek(out var firstToken)
+            && tokenizer.TryPeek(offset: 1, out secondToken)
+            && tokenizer.TryPeek(offset: 2, out thirdToken);
+
+        if (!hasTokens || firstToken!.Type != TokenType.StartCodeContext || secondToken!.Type != TokenType.EndDirective || thirdToken!.Type != TokenType.Else)
         {
             return null;
         }
 
-        tokenizer.Consume(2);
+        tokenizer.Consume(amount: 3);
 
         if (tokenizer.ConsumeIfNextIsOfType(TokenType.If))
         {
             var booleanExpression = ParseBooleanExpressionNode();
-            _ = ConsumeExpectedToken<CodeContextEndToken>("Expected else if statement to end with a ;");
+            ConsumeExpectedToken(TokenType.EndCodeContext, "Expected else if statement to end with }}");
             var blocks = ParseBlocks();
             var elseExpression = TryParseElseExpressionNode();
             return new ElseIfElseExpressionNode(blocks, booleanExpression, elseExpression);
         }
 
-        _ = ConsumeExpectedToken<CodeContextEndToken>("Expected else if statement to end with a ;");
+        ConsumeExpectedToken(TokenType.EndCodeContext, "Expected else statement to end with }}");
 
         var elseBlocks = ParseBlocks();
         return new ElseElseExpressionNode(elseBlocks);
@@ -237,7 +250,7 @@ public class Parser(Tokenizer tokenizer)
 
     private BooleanExpressionNode ParseBooleanExpressionNode()
     {
-        return ParseBooleanExpressionNode(GetRawNodeFromTokenizer(), 0);
+        return ParseBooleanExpressionNode(GetRawNodeFromTokenizer(), precedence: 0);
     }
 
     private BooleanExpressionNode ParseBooleanExpressionNode(BooleanExpressionNode left, int precedence)
@@ -384,18 +397,39 @@ public class Parser(Tokenizer tokenizer)
 
         bool IsNextTokenType(TokenType expectedTokenType)
         {
-            return tokenizer.TryPeek(1, out var next) && next!.Type == expectedTokenType;
+            return tokenizer.TryPeek(offset: 1, out var next) && next!.Type == expectedTokenType;
         }
+    }
+
+    private bool TryParseExpression(out ExpressionNode? expressionNode)
+    {
+        Token? secondToken = null;
+        var hasTokens = tokenizer.TryPeek(out var firstToken)
+            && tokenizer.TryPeek(1, out secondToken);
+
+        if (!hasTokens || firstToken!.Type != TokenType.StartCodeContext || secondToken!.Type is not TokenType.String and not TokenType.Number and not TokenType.Identifier)
+        {
+            expressionNode = null!;
+            return false;
+        }
+
+        tokenizer.Consume();
+        expressionNode = ParseExpression();
+        ConsumeExpectedToken(TokenType.EndCodeContext, "Expected expression to end with }}");
+        return true;
     }
 
     private ExpressionNode ParseExpression()
     {
+        if (TryParseVariableExpression(out var variableExpression))
+        {
+            return new VariableExpressionExpressionNode(variableExpression!);
+        }
         var token = tokenizer.Consume();
         return token.Type switch
         {
             TokenType.String => new StringExpressionNode((StringToken)token),
             TokenType.Number => new NumberExpressionNode((NumberToken)token),
-            TokenType.Identifier => new IdentifierExpressionNode((IdentifierToken)token),
             _ => throw new ParserException($"Token {token.Type} is not eligible for expressions", token)
         };
     }
@@ -424,6 +458,21 @@ public class Parser(Tokenizer tokenizer)
             TokenType.Identifier => new IdentifierRangeValueNode(new IdentifierNode((IdentifierToken)token)),
             _ => throw new ParserException("Unexpected value for range", token)
         };
+    }
+
+    private void ConsumeExpectedToken(TokenType tokenType, string errorMessage)
+    {
+        if (!tokenizer.TryPeek(out var token))
+        {
+            throw new ParserException(errorMessage, tokenizer.Last);
+        }
+
+        tokenizer.Consume();
+
+        if (token!.Type != tokenType)
+        {
+            throw new ParserException(errorMessage, token);
+        }
     }
 
     private TToken ConsumeExpectedToken<TToken>(string errorMessage)

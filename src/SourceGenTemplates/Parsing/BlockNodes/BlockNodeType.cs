@@ -3,6 +3,5 @@
 public enum BlockNodeType
 {
     CSharp,
-    Directive,
-    VariableInsertion
+    Template
 }

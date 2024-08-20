@@ -1,8 +1,6 @@
-﻿using SourceGenTemplates.Parsing.Directives;
+﻿namespace SourceGenTemplates.Parsing.ControlDirectives;
 
-namespace SourceGenTemplates.Parsing.ControlDirectives;
-
-public abstract class BooleanExpressionNode(BooleanExpressionType type) : DirectiveNode(DirectiveNodeType.If)
+public abstract class BooleanExpressionNode(BooleanExpressionType type) : Node
 {
     public BooleanExpressionType ExpressionType => type;
 }

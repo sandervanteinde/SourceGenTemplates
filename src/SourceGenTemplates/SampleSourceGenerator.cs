@@ -8,11 +8,6 @@ using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates;
 
-/// <summary>
-///     A sample source generator that creates C# classes based on the text file (in this case, Domain Driven Design
-///     ubiquitous language registry).
-///     When using a simple text file as a baseline, we can create a non-incremental source generator.
-/// </summary>
 [Generator]
 public class SampleSourceGenerator : ISourceGenerator
 {
@@ -55,11 +50,11 @@ public class SampleSourceGenerator : ISourceGenerator
                 const DiagnosticSeverity severity = DiagnosticSeverity.Error;
 #endif
                 var diagnosticDescriptor = new DiagnosticDescriptor(
-                    "sourcegentemplates001", "Invalid expression", "Parse error: {0}", "Design", severity, true
+                    "sourcegentemplates001", "Invalid expression", "Parse error: {0}", "Design", severity, isEnabledByDefault: true
                 );
                 var diagnostic = Diagnostic.Create(
                     diagnosticDescriptor,
-                    Location.Create(additionalFile.Path, new TextSpan(0, sourceText.Length), exception.LinePosition),
+                    Location.Create(additionalFile.Path, new TextSpan(start: 0, sourceText.Length), exception.LinePosition),
                     exception.Message
                 );
                 context.ReportDiagnostic(diagnostic);

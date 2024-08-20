@@ -12,18 +12,18 @@ public class IfNode(BooleanExpressionNode booleanExpressionNode, IReadOnlyCollec
 
     protected internal override void AppendDebugString(StringBuilder sb)
     {
-        sb.Append("if ");
+        sb.Append("{{#if ");
         booleanExpressionNode.AppendDebugString(sb);
-        sb.Append(";");
+        sb.AppendLine("}}");
 
         foreach (var block in blocks)
         {
             block.AppendDebugString(sb);
         }
-        
+
         elseExpressionNode?.AppendDebugString(sb);
 
-        sb.Append(" end;");
+        sb.AppendLine("{{/if}}");
     }
 }
 

@@ -19,7 +19,10 @@
     "grammars": [{
       "language": "cstempl",
       "scopeName": "source.cs.sourcegentemplates",
-      "path": "./syntaxes/cstempl.tmLanguage.json"
+      "path": "./syntaxes/cstempl.tmLanguage.json",
+      "embeddedLanguages": {
+        "meta.embedded.block.csharp": "csharp"
+      }
     }]
   }
 }

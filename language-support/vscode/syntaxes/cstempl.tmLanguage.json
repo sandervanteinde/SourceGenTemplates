@@ -6,52 +6,48 @@
 	],
 	"patterns": [
 		{
-			"include": "#multi-line-statement"
+			"include": "#code-context"
 		},
 		{
-			"include": "#csharp-overrides"
-		},
-		{
-			"include": "source.cs"
+			"include": "#non-code-context"
 		}
 	],
-	"foldingStartMarker": "::",
-	"foldingStopMarker": ";",
+	"foldingStartMarker": "{{",
+	"foldingStopMarker": "}}",
 	"repository": {
-		"csharp-overrides": {
+		"code-context": {
+			"begin": "{{",
+			"end": "}}",
+			"name": "expression.csharptemplcodecontext",
 			"patterns": [
 				{
-					"include": "source.cs.namespace-declaration"
+					"include": "#reserved-keywords"
 				},
 				{
-					"include": "#multi-line-statement"
+					"include": "#directive-names"
 				}
-			]
-		},
-		"multi-line-statement": {
-			"begin": "(::)",
-			"end": "(;|::)",
-			"contentName": "source.cs",
+			],
 			"beginCaptures": {
-				"1": {
-					"name": "meta.context-switch"
-				}
+			  "0": { "name": "punctuation.paren.open" }
 			},
-			"patterns": [
-				{
-					"include": "#template-context"
-				}
-			]
+			"endCaptures": {
+			  "0": { "name": "punctuation.paren.close" }
+			}
 		},
-		"template-context": {
+		"reserved-keywords": {
+			"match": "\\b(where|is|and|has_attribute|not|in|to)\\b",
+            "name": "keyword.operator.keyword.cstempl"
+		},
+		"directive-names": {
+			"match": "(#|\\/)(foreach|filename|for|if|else)",
+			"name": "keyword.control.directive.cstempl"
+		},
+		"non-code-context": {
+			"match": ".+?(?={{)",
+			"name": "meta.embedded.block.csharp",
 			"patterns": [
 				{
-					"name": "keyword.control",
-					"match": "(foreach|where|as|and|or|end|filename)"
-				},
-				{
-					"name": "entity.name.function",
-					"match": "(class|partial|private|proptected|public)"
+					"include": "source.cs"
 				}
 			]
 		}

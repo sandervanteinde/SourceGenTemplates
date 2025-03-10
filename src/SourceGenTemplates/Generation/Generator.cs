@@ -17,7 +17,7 @@ using SourceGenTemplates.Tokenization;
 
 namespace SourceGenTemplates.Generation;
 
-public class Generator(string fileName, FileNode file, GeneratorExecutionContext context, CompilationContext compilationContext)
+public class Generator(string fileName, FileNode file, SourceProductionContext context, CompilationContext compilationContext)
 {
     private readonly StringBuilder _sb = new();
     private readonly VariableContext _variables = new(compilationContext);

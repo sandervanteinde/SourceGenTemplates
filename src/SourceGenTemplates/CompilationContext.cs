@@ -4,16 +4,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SourceGenTemplates;
 
-public class CompilationContext(Compilation contextSemanticModel)
+public class CompilationContext(Compilation contextSemanticModel, IReadOnlyCollection<ClassDeclarationSyntax> classes)
 {
-    private readonly List<ClassDeclarationSyntax> classes = new();
-
     public IReadOnlyCollection<ClassDeclarationSyntax> Classes => classes;
-
-    public void AddClass(ClassDeclarationSyntax @class)
-    {
-        classes.Add(@class);
-    }
 
     public SemanticModel GetSemanticModel(SyntaxTree syntaxTree)
     {
